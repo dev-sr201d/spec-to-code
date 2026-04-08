@@ -6,7 +6,7 @@ Clear explanation of what needs to be built.
 
 ## Dependencies
 
-- [Task NNN] — Why this dependency exists
+- [FNNN-TNNN] — Why this dependency exists
 
 ## Technical Requirements
 

@@ -3,6 +3,4 @@ description: "Plan implementation tasks for a specific feature. Use when an FRD 
 agent: dev
 ---
 
-Plan implementation tasks for feature **${input:feature}**.
-
-If prerequisite ADRs are missing for the technologies this feature needs, **stop and hand off to the arch agent** before creating tasks.
+Plan implementation tasks for feature **${input:feature}** using `/plan-skill`.

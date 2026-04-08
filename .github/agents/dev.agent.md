@@ -2,8 +2,9 @@
 name: dev
 description: "Use when implementing code, writing tests, scaffolding projects, breaking down features into technical tasks, or debugging issues. Develops features following AGENTS.md guidelines and ADR decisions."
 argument-hint: "Specify the feature to plan or task to implement..."
-tools: [read/readFile, read/problems, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, search/usages, execute/runInTerminal, execute/testFailure, agent/runSubagent, web/fetch, web/githubRepo, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
+tools: [read/readFile, read/problems, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, search/usages, execute/runInTerminal, execute/testFailure, agent, web/fetch, web/githubRepo, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
 model: Claude Opus 4.6 (copilot)
+agents: [lead, arch]
 handoffs:
   - label: Review with Dev Lead
     agent: lead
@@ -32,6 +33,7 @@ Before starting any work, read:
 - **Break down features** into independent, testable technical tasks using `/plan-skill`
 - **Implement features** following AGENTS.md guidelines and ADR decisions using `/implement-skill`
 - **Write unit tests** for all new functionality
+- **Write integration and E2E tests** for cross-component behavior using `/test-skill`
 - **Scaffold projects** according to technology choices in ADRs
 - **Debug issues** and fix defects efficiently
 - **Run tests locally** before considering work complete

@@ -27,3 +27,13 @@ As a [user type], I want to [do something], so that [benefit].
 
 - [Assumption 1]
 - [Constraint 1]
+
+## 7. Open Questions
+
+- [ ] [Unresolved question or decision needed from stakeholders]
+
+## 8. Release Criteria
+
+- **Feature flag**: [Flag name, if progressive delivery is used]
+- **Rollout strategy**: [All users / percentage rollout / opt-in]
+- **Rollback plan**: [How to disable the feature if issues arise]

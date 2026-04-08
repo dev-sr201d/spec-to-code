@@ -25,7 +25,27 @@ As a [user type], I want to [do something], so that [benefit].
 **Acceptance Criteria:**
 - Given [context], when [action], then [outcome].
 
-## 6. Assumptions & Constraints
+## 6. Stakeholders
+
+| Role | Name / Team | Responsibility |
+|------|-------------|----------------|
+| Decision-maker | | Final approval on scope and priorities |
+| Consulted | | Domain expertise, technical feasibility |
+| Informed | | Progress updates, release readiness |
+
+## 7. Risks & Mitigations
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| [Risk 1] | High / Medium / Low | High / Medium / Low | [Mitigation strategy] |
+
+## 8. Assumptions & Constraints
 
 - [Assumption 1]
 - [Constraint 1]
+
+## 9. Milestones
+
+| Milestone | Description | Target |
+|-----------|-------------|--------|
+| [Milestone 1] | What it includes | [Timeframe or dependency] |

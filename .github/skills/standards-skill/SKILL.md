@@ -41,6 +41,9 @@ Organize into clear sections:
 - **Frontend**: Standards specific to the frontend technology stack
 - Add or omit sections based on the actual tech stack — do not include sections for technologies not in use.
 
+**Required fields**: The following fields under `General > Testing` must always be defined — downstream agents (dev, lead) depend on them and will block if they are missing:
+- **Code coverage threshold** — Minimum line coverage percentage (e.g., `80%`, `85%`). The dev agent uses this to validate test runs, and the lead agent uses it as the gate for code review approval.
+
 ### 4. Include Practical Examples
 
 For each guideline, show a brief code example demonstrating the expected pattern.

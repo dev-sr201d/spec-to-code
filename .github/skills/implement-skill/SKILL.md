@@ -57,8 +57,9 @@ Write the implementation following:
 
 - Write unit tests for all public methods and functions
 - Cover edge cases and error conditions
-- Follow coverage standards defined in `AGENTS.md`
+- Follow the coverage threshold defined in the `General > Testing` section of `AGENTS.md`. If `AGENTS.md` does not specify a coverage threshold, **stop and hand off to the arch agent** to define one via `/standards-skill` before proceeding.
 - Run tests via `execute/runInTerminal` (e.g., `dotnet test`, `npm test`) and iterate until all pass
+- For integration, contract, or E2E tests beyond unit tests, use `/test-skill`
 
 ### 7. Verify Integration
 
@@ -78,3 +79,5 @@ If the project has documentation:
 ## Quality
 
 Before marking a task complete, run through the [quality checklist](./references/quality-checklist.md).
+
+Once the checklist passes, hand off to the **lead** agent for code review via `/code-review-skill`. The task is not complete until the lead agent approves it.
