@@ -3,7 +3,7 @@ name: pm
 description: "Main orchestration agent that analyzes user intent and delegates tasks to specialized agents for product management, architecture, planning, and development."
 argument-hint: "Describe what you need — feature idea, architecture question, implementation request..."
 tools: [read/readFile, agent, search/codebase, search/changes, search/fileSearch, search/listDirectory, search/textSearch, web/fetch, todo]
-model: Claude Opus 4.6 (copilot)
+model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [po, lead, arch, dev, analyst, doc]
 handoffs:
   - label: Create or Update PRD

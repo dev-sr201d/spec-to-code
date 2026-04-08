@@ -23,7 +23,7 @@ Systematically analyze the project to build a complete mental model before writi
 
 **Delegation**: Each discovery sub-phase (1.1–1.8) must be delegated to its own subagent for context isolation. Each subagent receives the task description below and must return a structured findings report. After all subagents complete, synthesize their findings into a unified understanding before proceeding to Phase 2.
 
-**Subagent execution**: Use the **Explore** agent (a built-in VS Code Copilot agent for read-only codebase exploration — not defined in `.github/agents/`) for all discovery sub-phases. Sub-phases 1.1 and 1.2 must run first (sequentially or in parallel). Once their results are available, sub-phases 1.3–1.8 may run in parallel since they benefit from but do not strictly depend on each other. Pass relevant findings from 1.1/1.2 into each subsequent subagent prompt for context.
+**Subagent execution**: Use the **explore-write** agent (defined in `.github/agents/explore-write.agent.md`) for all discovery sub-phases. It has read, search, and edit tools — enough to explore broadly and write the analysis report files. Sub-phases 1.1 and 1.2 must run first (sequentially or in parallel). Once their results are available, sub-phases 1.3–1.8 may run in parallel since they benefit from but do not strictly depend on each other. Pass relevant findings from 1.1/1.2 into each subsequent subagent prompt for context.
 
 For each subagent call, instruct it to:
 - Perform only its assigned sub-phase

@@ -68,6 +68,7 @@ Shortcut prompts for common actions users may want to invoke manually, available
 
 | Prompt | Agent | Action |
 |--------|-------|--------|
+| `/prd` | po | Create or update the Product Requirements Document from a project idea |
 | `/refine` | po | Refine an FRD based on feedback or changed requirements |
 | `/reconsider` | arch | Re-evaluate an architecture decision with new information |
 | `/plan` | dev | Plan implementation tasks for a feature |
@@ -76,6 +77,7 @@ Shortcut prompts for common actions users may want to invoke manually, available
 | `/review-spec` | lead | Review PRDs and FRDs for technical feasibility and completeness |
 | `/analyze` | analyst | Reverse-engineer an existing codebase into specs, ADRs, and AGENTS.md |
 | `/triage` | lead | Triage pending issues in `specs/issues.md` after analyst onboarding |
+| `/doc` | doc | Create or update project documentation in `docs/` |
 
 ## Quick Start
 

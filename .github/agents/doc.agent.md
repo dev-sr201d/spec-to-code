@@ -3,7 +3,7 @@ name: doc
 description: "Use when creating, updating, or reviewing project documentation in docs/. Covers architecture docs, operations guides, and usage manuals. Generates documentation from specs, ADRs, AGENTS.md, and source code."
 argument-hint: "Describe the documentation to create or update, or specify a docs/ file to review..."
 tools: [read/readFile, agent, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, web/fetch, web/githubRepo, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
-model: Claude Opus 4.6 (copilot)
+model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [arch, po, lead]
 handoffs:
   - label: Clarify Architecture

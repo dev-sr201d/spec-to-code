@@ -3,7 +3,7 @@ name: po
 description: "Use when creating PRDs, gathering requirements, writing FRDs, defining features, or breaking down product specs. Synthesizes stakeholder input into structured Product Requirements Documents that align business goals with user needs."
 argument-hint: "Describe the product idea, feature, or requirement change..."
 tools: [read/readFile, agent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, web/fetch, todo]
-model: Claude Opus 4.6 (copilot)
+model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [lead, arch]
 handoffs: 
   - label: Review PRD for Technical Feasibility

@@ -3,7 +3,7 @@ name: lead
 description: "Use when reviewing PRDs or FRDs for technical feasibility, completeness, and missing requirements, reviewing implemented code against task acceptance criteria and AGENTS.md standards, or triaging the analyst's issues manifest. Read-only for specs and code — produces findings and recommendations. Edits only specs/issues.md during triage."
 argument-hint: "Provide the PRD or FRD to review, the task to code-review, or describe the technical concern..."
 tools: [read/readFile, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, agent, edit/editFiles, web/fetch, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
-model: Claude Opus 4.6 (copilot)
+model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [po, arch, dev]
 handoffs: 
   - label: Continue with Product Owner
