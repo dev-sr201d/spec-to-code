@@ -24,6 +24,13 @@ Implement a technical task from `specs/tasks/`, writing code and tests that foll
 - `specs/features/*.md` — Relevant feature requirements
 - `specs/tasks/*.md` — Task specifications for what to implement
 
+**Context management for large projects:** When the project has many ADRs, FRDs, or task files, read selectively to stay within context limits:
+- Read `AGENTS.md` and the **specific task file** first — these are always required in full.
+- Read only the **FRD referenced by the task** (check the `FNNN` prefix), not all FRDs.
+- Read only the **ADRs referenced by the task or its FRD** (check ADR numbers cited in requirements), not all ADRs.
+- Read `specs/prd.md` only for overall context — skim the requirements table rather than reading every section in detail.
+- If context is still constrained, prioritize: task file > AGENTS.md > relevant ADRs > relevant FRD > PRD.
+
 ### 2. Check Task Status
 
 Before proceeding, verify the task is actionable:
@@ -75,6 +82,14 @@ If the project has documentation:
 - **STOP** — Do not make major architectural decisions during implementation
 - **Hand back to the arch agent** to create proper ADRs first
 - Provide context: what decision is needed and what the blocker is
+
+## Failure Recovery
+
+If the implementation is fundamentally blocked or the approach is wrong, do not continue patching a broken approach:
+
+1. **Revert changes** — Use version control (`git stash` or `git checkout -- .`) to discard the broken implementation.
+2. **Report the blocker** — Hand off to the **lead** or **arch** agent with: what was attempted, why it failed, and what decision or change is needed to unblock.
+3. **Do not retry the same approach** — Wait for guidance before restarting implementation.
 
 ## Quality
 

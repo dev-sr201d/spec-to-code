@@ -97,7 +97,9 @@ The PM follows this sequence:
 | 10 | **lead** | Reviews code against acceptance criteria and standards | Verdict: approved or changes requested |
 | 11 | **doc** | Generates project documentation | `docs/` |
 
-Each delegation pauses for your confirmation before proceeding. You can redirect, provide feedback, or skip steps at any point.
+Each delegation pauses for your confirmation before proceeding — no agent acts until you approve. This is controlled by the `send: false` setting on all agent handoffs, which presents the delegation as a proposal rather than auto-executing it. You can redirect, provide feedback, or skip steps at any point.
+
+Feel free to change `send` settings on any handoff for more automation. For example, you might want to auto-approve the lead's code review to speed up implementation, or you might want to auto-generate ADRs from the architect without waiting for your review.
 
 ### Feature Refinement
 

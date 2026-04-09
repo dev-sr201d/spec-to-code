@@ -24,6 +24,12 @@ Break down feature requirements into ordered, independent technical tasks that a
 - `specs/adr/*.md` — Architecture decisions for technology choices and constraints
 - `AGENTS.md` — Development standards and guidelines to follow
 
+**Context management for large projects:** When the project has many ADRs or FRDs, read selectively to stay within context limits:
+- If planning a **specific feature**, read that feature's FRD in full, but only skim other FRDs for cross-feature dependencies.
+- Read only the **ADRs referenced by the target FRD** (check ADR numbers cited in requirements), not all ADRs. Read remaining ADRs only if the FRD references infrastructure or patterns you haven't seen yet.
+- Read `AGENTS.md` in full — it's always relevant for task acceptance criteria and testing thresholds.
+- Read `specs/prd.md` for overall vision — focus on the requirements table and scope boundaries rather than every section.
+
 ### 2. Verify Scaffolding FRD
 
 Before planning any feature, confirm that `specs/features/000-project-scaffolding.md` exists. This FRD is authored by the **arch agent** via `/scaffold-skill` and defines all cross-cutting project infrastructure.
@@ -47,6 +53,8 @@ Create a comprehensive list of technical tasks ensuring:
 - All layers of the architecture are covered for each feature (based on ADR decisions)
 - Dependencies between tasks are clearly identified
 - Tasks are ordered by their implementation sequence
+
+**Task granularity:** Each task should be independently implementable and reviewable in a single session. If a task touches more than 3 architecture layers or would require more than ~300 lines of new code, split it. If a task would produce fewer than ~20 lines, merge it with a related task.
 
 ### 5. Document Each Task
 
