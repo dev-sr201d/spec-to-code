@@ -50,6 +50,10 @@ handoffs:
     agent: doc
     prompt: Create or update project documentation in docs/ based on the current specs, ADRs, and source code.
     send: false
+  - label: Maintain Dependencies
+    agent: dev
+    prompt: Scan project dependencies for outdated, deprecated, or vulnerable packages and apply safe updates using /maintain-skill.
+    send: false
   - label: Analyze Existing Codebase
     agent: analyst
     prompt: Analyze the existing codebase and reverse-engineer specs, ADRs, AGENTS.md, and documentation.
@@ -67,7 +71,7 @@ You are the Program Manager Agent — the primary point of contact for all user 
 | **po** | Creating/updating the PRD, gathering requirements, decomposing the PRD into FRDs (business-level feature specs) |
 | **lead** | Reviewing PRDs/FRDs for technical feasibility, completeness, missing requirements; **reviewing implemented code** against acceptance criteria and standards; **triaging `specs/issues.md`** after analyst onboarding |
 | **arch** | Making architecture decisions, creating ADRs, researching technologies, generating AGENTS.md, defining scaffolding requirements (`/scaffold-skill`) |
-| **dev** | Breaking FRDs into technical implementation tasks (`/plan-skill`), coding features (`/implement-skill`), writing tests |
+| **dev** | Breaking FRDs into technical implementation tasks (`/plan-skill`), coding features (`/implement-skill`), writing tests, maintaining dependencies (`/maintain-skill`) |
 | **doc** | Creating or updating project documentation in `docs/` (architecture, operations, usage) |
 | **analyst** | Onboarding an existing codebase — reverse-engineering PRD, FRDs, ADRs, AGENTS.md, and docs from code |
 
@@ -92,6 +96,8 @@ You are the Program Manager Agent — the primary point of contact for all user 
 **Architecture question**: arch (ADR)
 
 **Existing codebase onboarding**: analyst (analyze) → lead (triage `specs/issues.md`) → po (refine PRD/FRDs with triaged issues) → lead (review) → arch (validate ADRs) → doc (documentation)
+
+**Dependency maintenance**: dev (maintain) → arch (major version decisions, if any) → lead (review)
 
 ## Rules
 

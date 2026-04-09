@@ -51,6 +51,9 @@ Identify which documentation areas need work:
 | User Manual | `docs/usage/user-manual.md` | PRD, FRDs | `assets/user-manual-template.md` |
 | API Reference | `docs/usage/api-reference.md` | source code, FRDs, ADRs | `assets/api-reference-template.md` |
 | Integrator Manual | `docs/usage/integrator-manual.md` | FRDs, ADRs, API specs | `assets/integrator-manual-template.md` |
+| Maintenance Log | `docs/operations/maintenance-log.md` | **Externally managed** by `/maintain-skill` | — |
+
+> **Note**: The maintenance log is append-only and written directly by the dev agent's `/maintain-skill`. Do not overwrite, regenerate, or include it in operations doc batches. When generating the documentation index (`docs/README.md`), link to it if it exists.
 
 ### 3. Delegate Documentation Work
 
