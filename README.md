@@ -38,7 +38,7 @@ Seven specialized agents collaborate through a delegation model, each with a dis
 | **pm** | Program Manager | Entry point for all requests. Analyzes intent and delegates to the right agent(s). Never writes code or specs directly. |
 | **po** | Product Owner | Translates ideas into a Product Requirement Document (PRD) (`specs/prd.md`) and breaks it into Feature Requirements Documents (FRDs) (`specs/features/`). Owns the *what*, never the *how*. |
 | **lead** | Dev Lead | Reviews PRDs and FRDs for technical feasibility, completeness, and missing requirements. Reviews implemented code against acceptance criteria and standards. Triages analyst issues. Read-only for specs and code — edits only `specs/issues.md` during triage. |
-| **arch** | Architect | Makes technology and architecture decisions, documented as ADRs (`specs/adr/`). Generates `AGENTS.md` with coding standards for the chosen stack. |
+| **arch** | Architect | Makes technology and architecture decisions, documented as ADRs (`specs/adr/`). Generates `AGENTS.md` with coding standards for the chosen stack. Defines scaffolding requirements (`specs/features/000-project-scaffolding.md`). |
 | **dev** | Developer | Plans implementation tasks (`specs/tasks/`) and writes code and tests following `AGENTS.md` guidelines and ADR decisions. |
 | **analyst** | Analyst | Onboards existing codebases by reverse-engineering specs, ADRs, AGENTS.md, and documentation from code. Entry point for adopting existing projects. |
 | **doc** | Documenter | Creates and maintains project documentation in `docs/` — architecture, operations, and usage guides derived from specs, ADRs, and source code. |
@@ -53,6 +53,7 @@ Each agent uses focused skills that define repeatable procedures:
 | **frd-skill** | po | Decompose the PRD into individual Feature Requirements Documents (FRDs) |
 | **adr-skill** | arch | Create Architecture Decision Records (MADR format) with researched options |
 | **standards-skill** | arch | Generate `AGENTS.md` engineering standards from ADR technology choices |
+| **scaffold-skill** | arch | Create the scaffolding FRD (Feature 000) from ADR decisions for project infrastructure |
 | **plan-skill** | dev | Break FRDs into ordered, independent technical tasks |
 | **implement-skill** | dev | Implement a task — write code and tests following project standards |
 | **test-skill** | dev | Define and implement integration, E2E, and contract tests |
@@ -129,9 +130,11 @@ Then:
 4.  PM delegates to Lead → Technical review of specs
 5.  PM delegates to Arch → ADRs created in specs/adr/
 6.  PM delegates to Arch → AGENTS.md generated with coding standards
-7.  PM delegates to Dev → Task plan created in specs/tasks/
-8.  PM delegates to Dev → Tasks implemented with tests
-9.  PM delegates to Lead → Code review against acceptance criteria and standards
+7.  PM delegates to Arch → Scaffolding FRD created in specs/features/000-project-scaffolding.md
+8.  PM delegates to Lead → Review scaffolding requirements
+9.  PM delegates to Dev → Task plan created in specs/tasks/
+10. PM delegates to Dev → Tasks implemented with tests
+11. PM delegates to Lead → Code review against acceptance criteria and standards
 ```
 
 You can also use prompts for refinement, reconsiderations, planning, and implementation directly for more control:
@@ -149,6 +152,7 @@ You can also use prompts for refinement, reconsiderations, planning, and impleme
 ├── agents/              # Agent definitions (pm, po, lead, arch, dev, analyst, doc)
 ├── copilot-instructions.md  # Global principles (SOLID, Zero Trust)
 ├── instructions/        # File-scoped conventions
+│   ├── agents-md.instructions.md     # Rules for AGENTS.md
 │   ├── doc-files.instructions.md     # Rules for docs/**/*.md
 │   ├── spec-files.instructions.md    # Rules for specs/**/*.md
 │   └── task-files.instructions.md    # Rules for specs/tasks/**
@@ -169,6 +173,7 @@ You can also use prompts for refinement, reconsiderations, planning, and impleme
     ├── implement-skill/ # Code implementation
     ├── plan-skill/      # Task planning (task template)
     ├── prd-skill/       # PRD creation (PRD template)
+    ├── scaffold-skill/  # Scaffolding FRD creation from ADRs
     ├── code-review-skill/ # Code review against acceptance criteria and standards
     ├── spec-review-skill/ # Spec review for feasibility and completeness
     ├── standards-skill/ # AGENTS.md generation (standards template)

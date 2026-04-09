@@ -24,21 +24,12 @@ Break down feature requirements into ordered, independent technical tasks that a
 - `specs/adr/*.md` — Architecture decisions for technology choices and constraints
 - `AGENTS.md` — Development standards and guidelines to follow
 
-### 2. Identify Scaffolding Tasks
+### 2. Verify Scaffolding FRD
 
-Based on the technologies chosen in the ADRs, create scaffolding tasks for project setup before any feature tasks. Scaffolding tasks use the `F000` prefix and must be completed before feature work begins.
+Before planning any feature, confirm that `specs/features/000-project-scaffolding.md` exists. This FRD is authored by the **arch agent** via `/scaffold-skill` and defines all cross-cutting project infrastructure.
 
-Review ADRs and identify scaffolding needs across these categories:
-
-| Category | What to Check | Example Tasks |
-|----------|--------------|---------------|
-| Project initialization | Language, framework, package manager ADRs | `F000-T001-project-init.md` — project skeleton, dependency install, base config |
-| CI/CD pipeline | Hosting, deployment, testing ADRs | `F000-T00N-ci-cd-pipeline.md` — build workflow, test workflow, deployment stages, environment configs |
-| Containerization | Hosting, infrastructure ADRs | `F000-T00N-containerization.md` — Dockerfile, compose files, registry config |
-| Test infrastructure | Testing framework ADRs | `F000-T00N-test-infrastructure.md` — test runner config, test database setup, fixture/factory scaffolding, E2E test harness |
-| Code quality tooling | Language, framework ADRs | `F000-T00N-code-quality.md` — linter, formatter, pre-commit hooks |
-
-Skip categories that don't apply. A library project doesn't need containerization. A CLI tool may not need CI/CD deployment stages. Only create scaffolding tasks for what the ADRs mandate.
+- If the scaffolding FRD **exists**, treat it like any other feature when creating tasks — scaffolding tasks use the `F000` prefix and must be completed before feature work begins. If the feature being planned requires infrastructure not covered by the existing scaffolding FRD (e.g., a database, message queue, or new deployment target), **hand off to the arch agent** to update the scaffolding FRD before proceeding.
+- If the scaffolding FRD **does not exist**, **stop** and hand off to the **arch agent** to create it via `/scaffold-skill` before proceeding with planning.
 
 ### 3. Reconcile Existing Tasks
 
@@ -78,7 +69,7 @@ Include in each task file:
 ## Quality Checklist
 
 - [ ] All context files read (PRD, FRDs, ADRs, AGENTS.md)
-- [ ] Scaffolding tasks created and ordered first
+- [ ] Scaffolding FRD (`000-project-scaffolding.md`) exists — handed off to arch if missing
 - [ ] Existing tasks reconciled (updated, added, or deprecated)
 - [ ] All architecture layers covered per feature
 - [ ] Task dependencies clearly mapped

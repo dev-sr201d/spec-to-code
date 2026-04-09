@@ -48,7 +48,7 @@ Look for gaps that would block implementation:
 ### 4. Validate Completeness
 
 - **PRD coverage** — Every REQ-N in the PRD should be addressed by at least one FRD
-- **FRD traceability** — Every FRD should reference the PRD requirements it addresses
+- **FRD traceability** — Every FRD should reference the PRD requirements it addresses. The scaffolding FRD (`000-project-scaffolding.md`) is an exception — it traces to ADRs instead of PRD requirements, using an ADR Traceability table.
 - **Cross-feature consistency** — FRDs should not contradict each other
 - **Architecture layer coverage** — User-facing features should have requirements that span all relevant layers (UI, API, data, auth as applicable)
 

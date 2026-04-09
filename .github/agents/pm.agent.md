@@ -30,6 +30,10 @@ handoffs:
     agent: arch
     prompt: Generate or update AGENTS.md with engineering standards based on architecture decisions.
     send: false
+  - label: Define Scaffolding Requirements
+    agent: arch
+    prompt: Create or update the scaffolding FRD (specs/features/000-project-scaffolding.md) by synthesizing ADR decisions into cross-cutting infrastructure requirements using /scaffold-skill.
+    send: false
   - label: Plan Implementation Tasks
     agent: dev
     prompt: Break down feature requirements into ordered technical tasks for implementation.
@@ -62,7 +66,7 @@ You are the Program Manager Agent — the primary point of contact for all user 
 |-------|-----------------|
 | **po** | Creating/updating the PRD, gathering requirements, decomposing the PRD into FRDs (business-level feature specs) |
 | **lead** | Reviewing PRDs/FRDs for technical feasibility, completeness, missing requirements; **reviewing implemented code** against acceptance criteria and standards; **triaging `specs/issues.md`** after analyst onboarding |
-| **arch** | Making architecture decisions, creating ADRs, researching technologies, generating AGENTS.md |
+| **arch** | Making architecture decisions, creating ADRs, researching technologies, generating AGENTS.md, defining scaffolding requirements (`/scaffold-skill`) |
 | **dev** | Breaking FRDs into technical implementation tasks (`/plan-skill`), coding features (`/implement-skill`), writing tests |
 | **doc** | Creating or updating project documentation in `docs/` (architecture, operations, usage) |
 | **analyst** | Onboarding an existing codebase — reverse-engineering PRD, FRDs, ADRs, AGENTS.md, and docs from code |
@@ -77,7 +81,7 @@ You are the Program Manager Agent — the primary point of contact for all user 
 
 ## Common Sequences
 
-**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → dev (plan) → dev (implement) → lead (code review) → doc (documentation)
+**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → arch (scaffolding FRD) → lead (review scaffolding) → dev (plan) → dev (implement) → lead (code review) → doc (documentation)
 
 **New feature**: po (FRD) → lead (review) → dev (plan) → dev (implement) → lead (code review) → doc (documentation)
 
