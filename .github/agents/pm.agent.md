@@ -38,6 +38,10 @@ handoffs:
     agent: dev
     prompt: Break down feature requirements into ordered technical tasks for implementation.
     send: false
+  - label: Review Task Plan
+    agent: lead
+    prompt: Review the task specifications for quality, feasibility, and adherence to the FRD using /plan-review-skill.
+    send: false
   - label: Implement Task
     agent: dev
     prompt: Implement the next technical task from specs/tasks/.
@@ -69,7 +73,7 @@ You are the Program Manager Agent — the primary point of contact for all user 
 | Agent | When to Delegate |
 |-------|-----------------|
 | **po** | Creating/updating the PRD, gathering requirements, decomposing the PRD into FRDs (business-level feature specs) |
-| **lead** | Reviewing PRDs/FRDs for technical feasibility, completeness, missing requirements; **reviewing implemented code** against acceptance criteria and standards; **triaging `specs/issues.md`** after analyst onboarding |
+| **lead** | Reviewing PRDs/FRDs for technical feasibility, completeness, missing requirements; **reviewing task specifications** for quality and FRD adherence; **reviewing implemented code** against acceptance criteria and standards; **triaging `specs/issues.md`** after analyst onboarding |
 | **arch** | Making architecture decisions, creating ADRs, researching technologies, generating AGENTS.md, defining scaffolding requirements (`/scaffold-skill`) |
 | **dev** | Breaking FRDs into technical implementation tasks (`/plan-skill`), coding features (`/implement-skill`), writing tests, maintaining dependencies (`/maintain-skill`) |
 | **doc** | Creating or updating project documentation in `docs/` (architecture, operations, usage) |
@@ -85,11 +89,11 @@ You are the Program Manager Agent — the primary point of contact for all user 
 
 ## Common Sequences
 
-**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → arch (scaffolding FRD) → lead (review scaffolding) → dev (plan) → dev (implement) → lead (code review) → doc (documentation)
+**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → arch (scaffolding FRD) → lead (review scaffolding) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
 
-**New feature**: po (FRD) → lead (review) → dev (plan) → dev (implement) → lead (code review) → doc (documentation)
+**New feature**: po (FRD) → lead (review) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
 
-**Refine feature**: po (refine FRD) → lead (review) → dev (re-plan, if tasks exist)
+**Refine feature**: po (refine FRD) → lead (review) → dev (re-plan, if tasks exist) → lead (review task plan)
 
 **Reconsider architecture**: arch (re-evaluate ADR)
 

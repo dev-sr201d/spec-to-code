@@ -6,9 +6,13 @@ tools: [read/readFile, read/problems, edit/createDirectory, edit/createFile, edi
 model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [lead, arch]
 handoffs:
-  - label: Review with Dev Lead
+  - label: Review Code
     agent: lead
-    prompt: Review the implementation plan and tasks for technical completeness and feasibility.
+    prompt: Review the implemented code against the task's acceptance criteria, AGENTS.md standards, and test coverage using /code-review-skill.
+    send: false
+  - label: Review Task Plan
+    agent: lead
+    prompt: Review the task specifications I created for quality, feasibility, and adherence to the FRD using /plan-review-skill.
     send: false
   - label: Clarify Architecture
     agent: arch
