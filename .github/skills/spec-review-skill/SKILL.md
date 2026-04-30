@@ -61,7 +61,30 @@ Look for gaps that would block implementation:
 
 **Exception — Zero Trust requirements are always mandatory.** Authentication, authorization, input validation, and encryption requirements from `copilot-instructions.md` must be flagged as missing if absent, regardless of whether the user explicitly asked for them. Simplicity-first applies to implementation complexity (in-memory vs. distributed cache, simple auth vs. OAuth federation), not to whether security boundaries exist at all.
 
-### 6. Report Findings
+### 6. Enforce Mandatory PRD Sections
+
+The PRD template defines sections that downstream agents (arch, dev, doc) depend on. The following sections must each be present and either filled in or explicitly marked `N/A` with a one-line rationale. Blank rows or missing sections are findings.
+
+| PRD Section | What must be present |
+|------------|----------------------|
+| §7 Non-Functional Requirements | Concrete targets for performance, capacity, availability, supported platforms, locales — or `N/A` with rationale per row |
+| §8 Compliance & Regulatory | Each regime row marked Yes/No; obligations listed for every "Yes" |
+| §9 Privacy & Data Classification | Data classes, PII inventory, retention, residency, subject rights, third-party processors |
+| §10 Accessibility & Internationalization | WCAG target, AT support, locales, RTL stance, locale-aware formatting |
+| §11 SLOs | At least one SLI/SLO row, error budget policy, RTO/RPO |
+| §12 Operational Expectations | Environments, release cadence, backup/DR cadence, support model |
+| §13 Telemetry & Analytics | Product analytics, operational telemetry, privacy controls |
+
+Rules of enforcement:
+
+- **`N/A` is acceptable, blanks are not.** Every section must show evidence of a deliberate decision.
+- **Compliance and Privacy never default to N/A silently.** If the PRD claims `N/A` for §8 or §9, the rationale must explain why no personal or regulated data is processed.
+- **Accessibility defaults to required.** Any user-facing feature must declare a WCAG conformance target. `N/A` is only valid if there is no human-facing UI.
+- **SLOs are required for any production-deployed system.** A library or developer-only CLI may use `N/A` with rationale.
+
+When sections are missing or under-specified, list each as a finding with the section number, the gap, and suggested text — describing WHAT, never HOW.
+
+### 7. Report Findings
 
 Provide a structured review:
 
@@ -88,6 +111,7 @@ Provide a structured review:
 - [ ] Missing requirements identified with suggested text
 - [ ] PRD-to-FRD traceability verified
 - [ ] Cross-feature consistency checked
+- [ ] Mandatory PRD sections (§7–§13) present and either filled or explicitly `N/A` with rationale
 - [ ] Simplicity-first principle applied — no unnecessary complexity added
 - [ ] All findings describe WHAT, never HOW
 - [ ] No spec files were edited — findings are recommendations only

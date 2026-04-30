@@ -9,4 +9,10 @@ Preserve existing requirement IDs and traceability. If new requirements are adde
 
 If the refinement changes scope, adds capabilities, or contradicts existing product requirements, cascade the changes up to `specs/prd.md` — update or add REQ-N entries as needed and confirm what was changed.
 
-After completing the refinement, check if tasks exist under `specs/tasks/FNNN/` for this feature. If so, remind the user to run `/plan` to reconcile them with the updated requirements.
+After completing the refinement, run the following cascade checks:
+
+1. **ADR re-validation** — Determine whether the refined FRD invalidates, contradicts, or requires new architecture decisions. Triggers include: new external interfaces, new data classes, new identity/auth requirements, new performance/availability targets, new compliance scope, new technologies. If any apply, hand off to the **arch** agent to re-evaluate the affected ADRs via `/reconsider` and to refresh `specs/threat-model.md` via `/threat-model-skill`.
+2. **Threat-model refresh** — If trust boundaries, data flows, stored data classes, or compliance scope changed, the threat model must be refreshed even if no ADR changes. Hand off to **arch** with `/threat-model-skill` scoped to this feature.
+3. **Task reconciliation** — Check whether tasks exist under `specs/tasks/FNNN/` for this feature. If so, remind the user to run `/plan` so the **dev** agent can reconcile them with the updated requirements.
+
+Report which cascades were triggered, which were skipped (with rationale), and what the user should run next.

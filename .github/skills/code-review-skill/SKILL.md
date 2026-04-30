@@ -62,15 +62,54 @@ Skip sections of `AGENTS.md` that don't apply to the task (e.g., frontend standa
   - Assert on implementation details (private methods, internal state) rather than observable behavior
   - Are trivially passing (e.g., `expect(true).toBe(true)`)
 
-### 6. Check for Common Issues
+### 6. Check for Production-Grade Concerns
 
-Scan the changed files for:
+Scan the changed files against the dev's [quality-checklist.md](../implement-skill/references/quality-checklist.md) and, for frontend code, [frontend-integration.md](../implement-skill/references/frontend-integration.md). Those files are the canonical lists; the categories below are the review lens.
 
-- **Security** — SQL/NoSQL injection, XSS, hardcoded credentials, missing auth checks, unvalidated redirects
-- **Resource management** — Unclosed connections, missing dispose/cleanup, unbounded collections
-- **Concurrency** — Race conditions, shared mutable state without synchronization
-- **Error leakage** — Stack traces or internal details exposed in error responses
+#### 6.1 Security & Supply Chain
+
+- **Injection** — SQL/NoSQL/command/LDAP injection, XSS, SSRF, unvalidated redirects, template injection
+- **Secrets** — No hardcoded credentials, tokens, or internal hostnames; secrets read from a secret store
+- **AuthN/AuthZ** — Every new endpoint/handler enforces authentication and authorization; no public-by-default routes; object-level authorization checks present
+- **Input validation** — Validation at every boundary (API, message handler, CLI, file I/O); deserialization is safe
+- **Output encoding** — Parameterized queries; encoded/escaped output; safe template rendering
+- **Crypto** — No deprecated algorithms (MD5/SHA1 for auth, ECB mode); no hand-rolled crypto; strong password hashing
+- **Dependencies** — New dependencies are maintained, license-compatible, and free of known CVEs (verify via package-audit / SCA output)
+
+#### 6.2 Observability
+
+- **Structured logs** at boundaries with correlation/request IDs
+- **No PII, secrets, tokens, or full payloads in logs** — verify via grep on changed log statements
+- **Errors logged with diagnostic context** (operation, identifiers, sanitized inputs)
+- **Metrics and traces** emitted for new code paths per `AGENTS.md` instrumentation standards
+- **User-facing errors** do not leak stack traces, SQL, file paths, or internal class names
+
+#### 6.3 Reliability & Performance
+
+- **Timeouts and bounded retries** on every external call; no infinite loops or unbounded fan-out
+- **Resource cleanup** on every path including error paths (connections, file handles, subscriptions, tasks)
+- **No obvious N+1 queries**, blocking I/O on async paths, synchronous network calls inside loops, or unbounded in-memory collections
+- **Concurrency** — Shared mutable state is synchronized or eliminated; no TOCTOU races
+- **Idempotency** — Retryable operations (writes, message handlers, webhooks) are safe to replay
+
+#### 6.4 Data & Migrations
+
+- **Migration safety** — Forward-only and backward-compatible with the prior app version (expand-contract); no destructive operations without explicit FRD authorization
+- **Migration testing** — Tested on a non-empty dataset; idempotent
+- **Data classification** — PII / sensitive fields handled per `AGENTS.md` (encryption, redaction, retention)
+- **Schema/contract changes** — OpenAPI / GraphQL / proto / event-schema artifacts updated alongside code
+
+#### 6.5 Risk Controls & Compatibility
+
+- **Backward compatibility** — Public API contracts preserved unless the FRD authorizes a breaking change; deprecations follow the project's deprecation policy
+- **Feature flags / kill switches** — Risky changes gated where `AGENTS.md` or the FRD requires it
+- **Rollback path** — Obvious and recorded in the task (revert, flag off, migration-down)
+
+#### 6.6 Hygiene
+
 - **Dead code** — Unused imports, unreachable branches, commented-out code
+- **Tooling drift** — No new compiler/linter warnings introduced
+- **CHANGELOG / release notes** updated if the project maintains them
 
 ### 7. Report Findings
 
@@ -104,6 +143,6 @@ If the verdict is `changes-requested`, hand off to the **dev** agent with the sp
 - [ ] Implementation checked against `AGENTS.md` standards
 - [ ] All tests confirmed passing (dev-provided evidence)
 - [ ] Test coverage meets threshold
-- [ ] Security scan completed on changed files
+- [ ] Production-grade concerns reviewed (security, observability, reliability, data, risk controls)
 - [ ] No source code was modified by this review
 - [ ] Findings report includes verdict, evidence, and clear next action

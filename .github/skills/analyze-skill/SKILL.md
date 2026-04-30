@@ -149,7 +149,8 @@ Phases must execute in this order due to data dependencies:
 - **Phase 2** (PRD) must complete before Phase 3 (FRDs), since FRDs reference `REQ-N` items from the PRD
 - **Phase 4** (ADRs) may run in parallel with Phases 2–3 — it depends only on Phase 1 findings
 - **Phase 5** (AGENTS.md) should follow Phase 4, so conventions can cross-reference ADR decisions
-- **Phase 6** (Issues Manifest Finalization) should follow Phases 2–5, since issues are accumulated throughout those phases
+- **Phase 5.5** (Threat Model) should follow Phases 2–5 — it consumes PRD compliance/privacy scope, FRD interfaces, and ADR technology choices
+- **Phase 6** (Issues Manifest Finalization) should follow Phases 2–5.5, since issues are accumulated throughout those phases
 - **Phase 7** (Documentation Handoff) must run last — it consumes all prior artifacts
 
 ### Phase 2: PRD Generation
@@ -161,7 +162,7 @@ Reverse-engineer product requirements from what the code actually does. Read `sp
 3. **Extract functional requirements** — Each distinct capability becomes a `REQ-N` requirement.
 4. **Note non-functional characteristics** — Observe actual performance patterns, security measures, scalability approach, reliability mechanisms.
 5. **Write `specs/prd.md`** using the [PRD template](../prd-skill/assets/prd-template.md).
-6. **Mark as reverse-engineered** — Add a note at the top: `> This PRD was reverse-engineered from the existing codebase by the analyst agent. Review and refine with the product owner.`
+6. **Mark as reverse-engineered** — Add a note at the top: `> This PRD was reverse-engineered from the existing codebase by the analyst agent. Triage any issues recorded in specs/issues.md and review and refine with the product owner.`
 7. **Record issues directly to `specs/issues.md`** — Any systemic issues discovered during PRD analysis (missing functionality, security gaps, etc.) go straight into the issues manifest. Use category `functionality` or `security` as appropriate. Reference the PRD as the source artifact.
 
 ### Phase 3: FRD Generation
@@ -174,7 +175,7 @@ Decompose the PRD into feature specs mapped to actual code modules.
 4. **Define acceptance criteria** — Based on what the code actually does (including edge cases you observe).
 5. **Create FRDs** in `specs/features/` using the [FRD template](../frd-skill/assets/frd-template.md).
 6. **Naming**: `NNN-<feature-name>.md` — numbered kebab-case, check existing files for sequence.
-7. **Mark as reverse-engineered** — Add a note at the top of each: `> This FRD was reverse-engineered from the existing codebase by the analyst agent. Review and refine with the product owner.`
+7. **Mark as reverse-engineered** — Add a note at the top of each: `> This FRD was reverse-engineered from the existing codebase by the analyst agent. Triage any issues recorded in specs/issues.md and review and refine with the product owner.`
 8. **Record issues directly to `specs/issues.md`** — Feature-specific issues (bugs, missing edge case handling, missing validation, missing tests, UX gaps, accessibility gaps, etc.) go straight into the issues manifest. Reference the relevant FRD as the source artifact.
 
 ### Phase 4: ADR Generation
@@ -192,7 +193,8 @@ Document the technology decisions that are already baked into the code — and v
    - Note if newer major versions offer significant improvements
 6. **Create in `specs/adr/`** using the [MADR template](../adr-skill/assets/madr-template.md).
 7. **Naming**: `NNN-short-title.md` — zero-padded, sequential, never reuse numbers.
-8. **Record issues directly to `specs/issues.md`** — Technology-specific issues (version currency, deprecated API usage, pattern violations, missing recommended configuration, security advisory matches, license concerns) go straight into the issues manifest. Reference the relevant ADR as the source artifact. Include official doc reference in the rationale.
+8. **Mark as reverse-engineered** — Add a note at the top of each: `> This ADR was reverse-engineered from the existing codebase by the analyst agent. Triage any issues recorded in specs/issues.md and review and refine with the arch agent.`
+9. **Record issues directly to `specs/issues.md`** — Technology-specific issues (version currency, deprecated API usage, pattern violations, missing recommended configuration, security advisory matches, license concerns) go straight into the issues manifest. Reference the relevant ADR as the source artifact. Include official doc reference in the rationale.
 
 ### Phase 5: AGENTS.md Generation
 
@@ -206,12 +208,22 @@ Extract coding standards from what the codebase actually practices — and valid
 6. **AGENTS.md must be issues-free** — AGENTS.md is loaded into every agent operation. It must contain only clean, authoritative guidelines — never issues, warnings, or deviation notes. Any findings about convention violations, inconsistent patterns, or deviations from best practices go directly into `specs/issues.md` with category `convention`. Include the observed pattern, the recommended pattern (with official doc link), and file path examples.
 7. **Write `AGENTS.md`** at the project root using the [AGENTS.md template](../standards-skill/assets/agents-template.md).
 
-### Phase 6: Issues Manifest Finalization
+### Phase 6: Threat Model
 
-Throughout Phases 2–5, issues have been written directly to `specs/issues.md`. This phase validates and finalizes the manifest.
+After AGENTS.md is in place, generate the initial threat model so that downstream review and remediation can use it as a reference.
+
+1. Invoke `/threat-model-skill` with full-refresh scope.
+2. Inputs: the PRD, all FRDs, all ADRs, and AGENTS.md just produced.
+3. Output: `specs/threat-model.md` covering all assets, trust boundaries, STRIDE analysis, and required mitigations cross-referenced to FRDs/ADRs.
+4. **Mark as reverse-engineered** — Add a note at the top: `> This threat model was reverse-engineered from the existing codebase by the analyst agent. Review and refine with the arch agent.`
+5. **Record issues directly to `specs/issues.md`** — Any threat with severity `critical` or `high` and no existing control becomes an issue with category `security`, referencing both the threat ID and the owning FRD/ADR.
+
+### Phase 7: Issues Manifest Finalization
+
+Throughout Phases 2–6, issues have been written directly to `specs/issues.md`. This phase validates and finalizes the manifest.
 
 1. **Create the manifest early** — At the start of Phase 2 (before writing any issues), create `specs/issues.md` with the header, column definitions, and the note: `> This issues manifest was generated by the analyst agent. All issues require triage by the dev lead before they enter the implementation pipeline.`
-2. **Issue format** — Every entry written during Phases 2–5 must include: a unique ID (`ISS-NNN`, sequentially assigned as issues are discovered), severity (critical / major / minor), category (security, quality, convention, testing, dependency, functionality), source artifact (file path of the PRD, FRD, or ADR the issue relates to), description, code location (file path and line range where the issue was observed), rationale (why it matters), and a `Triage` column initialized to `pending`.
+2. **Issue format** — Every entry written during Phases 2–6 must include: a unique ID (`ISS-NNN`, sequentially assigned as issues are discovered), severity (critical / major / minor), category (security, quality, convention, testing, dependency, functionality), source artifact (file path of the PRD, FRD, or ADR the issue relates to), description, code location (file path and line range where the issue was observed), rationale (why it matters), and a `Triage` column initialized to `pending`.
 3. **Validate completeness** — After Phase 5, review the manifest for: duplicate entries, missing fields, inconsistent severity ratings, and issues that lack code location evidence.
 4. **Sort by severity** — Critical first, then major, then minor.
 5. **Assign final IDs** — Renumber `ISS-NNN` entries sequentially after sorting so the manifest reads cleanly.
@@ -220,7 +232,7 @@ Valid triage values (set by the **lead** agent later, not by the analyst): `pend
 
 This manifest is the **single source of truth** for analyst-discovered issues. Downstream agents (lead, po, dev) consume it — spec artifacts (PRD, FRDs, ADRs) contain only clean spec content, no issues.
 
-### Phase 7: Documentation Handoff
+### Phase 8: Documentation Handoff
 
 Delegate to the **doc** agent to generate `docs/` content from the freshly created artifacts.
 
@@ -237,8 +249,9 @@ Each phase produces durable artifacts that persist to disk. If analysis is inter
 - **Phase 3** (frds) → Requires `specs/prd.md` to exist.
 - **Phase 4** (adrs) → Requires Phase 1 findings. Can run independently of Phases 2–3.
 - **Phase 5** (standards) → Requires ADRs in `specs/adr/` to exist.
-- **Phase 6** (issues) → Requires Phases 2–5 to be complete (issues accumulated throughout).
-- **Phase 7** (docs) → Requires all prior artifacts in `specs/` and `AGENTS.md`.
+- **Phase 6** (threat model) → Requires Phase 5 to be complete.
+- **Phase 7** (issues) → Requires Phases 2–6 to be complete (issues accumulated throughout).
+- **Phase 8** (docs) → Requires all prior artifacts in `specs/` and `AGENTS.md`.
 
 When resuming, check which artifacts already exist and skip completed phases.
 

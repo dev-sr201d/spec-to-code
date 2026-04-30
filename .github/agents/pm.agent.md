@@ -34,6 +34,10 @@ handoffs:
     agent: arch
     prompt: Create or update the scaffolding FRD (specs/features/000-project-scaffolding.md) by synthesizing ADR decisions into cross-cutting infrastructure requirements using /scaffold-skill.
     send: false
+  - label: Create or Update Threat Model
+    agent: arch
+    prompt: Create or refresh specs/threat-model.md using /threat-model-skill based on the current PRD, FRDs, and ADRs.
+    send: false
   - label: Plan Implementation Tasks
     agent: dev
     prompt: Break down feature requirements into ordered technical tasks for implementation.
@@ -89,11 +93,11 @@ You are the Program Manager Agent — the primary point of contact for all user 
 
 ## Common Sequences
 
-**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → arch (scaffolding FRD) → lead (review scaffolding) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
+**New project**: po (PRD) → po (FRDs) → lead (review) → arch (ADRs) → arch (AGENTS.md) → arch (scaffolding FRD) → arch (threat model) → lead (review scaffolding) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
 
-**New feature**: po (FRD) → lead (review) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
+**New feature**: po (FRD) → lead (review) → arch (threat-model refresh, if trust boundaries/data flows change) → dev (plan) → lead (review task plan) → dev (implement) → lead (code review) → doc (documentation)
 
-**Refine feature**: po (refine FRD) → lead (review) → dev (re-plan, if tasks exist) → lead (review task plan)
+**Refine feature**: po (refine FRD) → lead (review) → arch (re-validate ADRs and threat model) → dev (re-plan, if tasks exist) → lead (review task plan)
 
 **Reconsider architecture**: arch (re-evaluate ADR)
 
