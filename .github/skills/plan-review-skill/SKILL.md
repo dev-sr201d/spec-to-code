@@ -6,7 +6,7 @@ argument-hint: "Specify which feature's tasks to review (e.g., F001), a specific
 
 # Review Task Specifications
 
-Review task files in `specs/tasks/` for quality, feasibility, completeness, and faithful adherence to the parent FRD. This is the quality gate between planning and implementation.
+Review task files under `specs/tasks/FNNN/` for quality, feasibility, completeness, and faithful adherence to the parent FRD. This is the quality gate between planning and implementation.
 
 ## When to Use
 
@@ -23,7 +23,7 @@ Review task files in `specs/tasks/` for quality, feasibility, completeness, and 
 - `specs/prd.md` — Product requirements for overall vision
 - `specs/features/*.md` — The FRDs that the tasks trace to
 - `specs/adr/*.md` — Architecture decisions for technology constraints
-- `specs/tasks/*.md` — The task files under review
+- `specs/tasks/**/*.md` — The task files under review (organized in per-feature `FNNN/` subfolders)
 
 **Context management for large projects:** When reviewing tasks for a specific feature, read selectively:
 - Read the **target feature's FRD** in full.
@@ -56,7 +56,7 @@ Check the task set as a whole:
 - **Dependency graph** — Are there circular dependencies? Is the implementation order logical?
 - **Granularity** — Tasks that touch more than 3 architecture layers or would require ~300+ lines should be split. Tasks under ~20 lines should be merged.
 - **Architecture coverage** — For user-facing features, are all relevant layers covered (UI, API, service, data, auth)?
-- **Naming** — Files follow `FNNN-TNNN-<task-name>.md` convention with kebab-case descriptions.
+- **Layout & naming** — Tasks live at `specs/tasks/FNNN/NNN-<task-name>.md` with kebab-case descriptions. Reference IDs use the `FNNN/NNN` form.
 - **No implementation code** — Task files describe WHAT, not HOW. Flag any code snippets, class names, or method signatures.
 
 ### 5. Cross-Check Against Standards

@@ -9,4 +9,4 @@ Preserve existing requirement IDs and traceability. If new requirements are adde
 
 If the refinement changes scope, adds capabilities, or contradicts existing product requirements, cascade the changes up to `specs/prd.md` — update or add REQ-N entries as needed and confirm what was changed.
 
-After completing the refinement, check if tasks exist in `specs/tasks/` for this feature. If so, remind the user to run `/plan` to reconcile them with the updated requirements.
+After completing the refinement, check if tasks exist under `specs/tasks/FNNN/` for this feature. If so, remind the user to run `/plan` to reconcile them with the updated requirements.

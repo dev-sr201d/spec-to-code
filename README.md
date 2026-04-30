@@ -92,7 +92,7 @@ The PM follows this sequence:
 | 5 | **arch** | Generates engineering standards from ADR choices | `AGENTS.md` |
 | 6 | **arch** | Defines scaffolding infrastructure requirements | `specs/features/000-project-scaffolding.md` |
 | 7 | **lead** | Reviews scaffolding requirements | Findings and recommendations |
-| 8 | **dev** | Breaks features into ordered technical tasks | `specs/tasks/*.md` |
+| 8 | **dev** | Breaks features into ordered technical tasks | `specs/tasks/FNNN/*.md` |
 | 9 | **dev** | Implements each task with tests | Source code and tests |
 | 10 | **lead** | Reviews code against acceptance criteria and standards | Verdict: approved or changes requested |
 | 11 | **doc** | Generates project documentation | `docs/` |
@@ -118,9 +118,9 @@ For fine-grained control over individual steps, use prompts directly instead of 
 | Action | Prompt | Agent |
 |--------|--------|-------|
 | Plan tasks for a feature | `/plan 001-user-authentication` | dev |
-| Implement a specific task | `/implement F001-T003-login-endpoint` | dev |
+| Implement a specific task | `/implement F001/003-login-endpoint` | dev |
 | Review specs before architecture | `/review-spec` | lead |
-| Review code after implementation | `/review-code F001-T003-login-endpoint` | lead |
+| Review code after implementation | `/review-code F001/003-login-endpoint` | lead |
 | Re-evaluate a past architecture decision | `/reconsider 002-database-choice` | arch |
 
 The task plan produced by `/plan` includes a dependency graph. Tasks without shared dependencies can be implemented in parallel — invoke `/implement` for each one. Tasks with dependencies must be implemented in order.
@@ -191,7 +191,7 @@ The **lead** agent classifies each issue as `promote` (add to an existing FRD), 
 | **po** | Product Owner | Translates ideas into a PRD (`specs/prd.md`) and FRDs (`specs/features/`). Owns the *what*, never the *how*. |
 | **lead** | Dev Lead | Reviews specs for feasibility, reviews code against acceptance criteria and standards, triages analyst issues. Read-only for specs and code — edits only `specs/issues.md`. |
 | **arch** | Architect | Makes technology and architecture decisions as ADRs (`specs/adr/`). Generates `AGENTS.md` with coding standards. Defines scaffolding requirements. |
-| **dev** | Developer | Plans tasks (`specs/tasks/`), implements code and tests following `AGENTS.md`, and maintains dependencies. |
+| **dev** | Developer | Plans tasks (`specs/tasks/FNNN/`), implements code and tests following `AGENTS.md`, and maintains dependencies. |
 | **analyst** | Analyst | Onboards existing codebases by reverse-engineering specs, ADRs, `AGENTS.md`, and documentation from code. |
 | **doc** | Documenter | Creates and maintains project documentation in `docs/` — architecture, operations, and usage guides. |
 

@@ -21,7 +21,7 @@ Review implemented code against the task specification, engineering standards, a
 **ALWAYS start by reading these files:**
 - `AGENTS.md` — Engineering standards and conventions to verify against
 - `specs/adr/*.md` — Architecture decisions (to verify technology and pattern compliance)
-- The specific task file in `specs/tasks/` — Acceptance criteria define pass/fail
+- The specific task file under `specs/tasks/FNNN/` — Acceptance criteria define pass/fail
 - The relevant FRD in `specs/features/` — Functional requirements the code must satisfy
 
 ### 2. Identify Changed Files

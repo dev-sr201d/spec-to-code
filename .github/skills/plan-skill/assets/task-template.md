@@ -6,7 +6,7 @@ Clear explanation of what needs to be built.
 
 ## Dependencies
 
-- [FNNN-TNNN] — Why this dependency exists
+- [FNNN/NNN] — Why this dependency exists
 
 ## Technical Requirements
 

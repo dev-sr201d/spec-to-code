@@ -30,7 +30,7 @@ Before starting any work, read:
 - **`specs/adr/*.md`** — Architecture decisions and rationale (consult for tech choices)
 - **`specs/prd.md`** — Product requirements for overall context
 - **`specs/features/*.md`** — Feature requirements for specific work
-- **`specs/tasks/*.md`** — Task specifications (when implementing)
+- **`specs/tasks/**/*.md`** — Task specifications, organized as `specs/tasks/FNNN/NNN-<task-name>.md` (when implementing)
 
 ## Core Responsibilities
 

@@ -10,7 +10,7 @@ Implement a technical task from `specs/tasks/`, writing code and tests that foll
 
 ## When to Use
 
-- A task file exists in `specs/tasks/` and is ready for implementation
+- A task file exists under `specs/tasks/FNNN/` and is ready for implementation
 - Code needs to be written following established ADRs and AGENTS.md
 
 ## Procedure
@@ -22,11 +22,11 @@ Implement a technical task from `specs/tasks/`, writing code and tests that foll
 - `specs/adr/*.md` — Architecture decisions for technology choices
 - `specs/prd.md` — Product requirements for overall context
 - `specs/features/*.md` — Relevant feature requirements
-- `specs/tasks/*.md` — Task specifications for what to implement
+- `specs/tasks/**/*.md` — Task specifications for what to implement (organized as `specs/tasks/FNNN/NNN-<task-name>.md`)
 
 **Context management for large projects:** When the project has many ADRs, FRDs, or task files, read selectively to stay within context limits:
 - Read `AGENTS.md` and the **specific task file** first — these are always required in full.
-- Read only the **FRD referenced by the task** (check the `FNNN` prefix), not all FRDs.
+- Read only the **FRD referenced by the task** (the `FNNN` folder containing the task file maps directly to the FRD), not all FRDs.
 - Read only the **ADRs referenced by the task or its FRD** (check ADR numbers cited in requirements), not all ADRs.
 - Read `specs/prd.md` only for overall context — skim the requirements table rather than reading every section in detail.
 - If context is still constrained, prioritize: task file > AGENTS.md > relevant ADRs > relevant FRD > PRD.

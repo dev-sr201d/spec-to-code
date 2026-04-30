@@ -39,11 +39,11 @@ Before planning any feature, confirm that `specs/features/000-project-scaffoldin
 
 ### 3. Reconcile Existing Tasks
 
-Check `specs/tasks/` for tasks related to the feature being planned:
+Check `specs/tasks/FNNN/` (the feature's task folder) for tasks related to the feature being planned:
 - **Update** tasks whose backing FRD requirements have changed (revised scope, new acceptance criteria)
 - **Add** new tasks for newly introduced requirements
 - **Deprecate** tasks whose backing requirements were deprecated in the FRD — add a `Status: Deprecated` marker, never delete
-- **Preserve numbering** — never reuse or renumber existing task IDs (`FNNN-TNNN`)
+- **Preserve numbering** — never reuse or renumber existing task IDs (`FNNN/NNN`)
 
 If no existing tasks are found, skip this step.
 
@@ -58,9 +58,9 @@ Create a comprehensive list of technical tasks ensuring:
 
 ### 5. Document Each Task
 
-Create a file per task in `specs/tasks/` using the [task template](./assets/task-template.md).
+Create a file per task under `specs/tasks/FNNN/` using the [task template](./assets/task-template.md). Create the per-feature folder if it does not yet exist.
 
-**Naming**: `FNNN-TNNN-<task-name>.md` — where `FNNN` is the feature number from the FRD (e.g., `F001` for `001-user-authentication.md`) and `TNNN` is a per-feature sequential task number (e.g., `F001-T001-backend-scaffolding.md`, `F001-T002-login-endpoint.md`). Scaffolding tasks shared across features use `F000` (e.g., `F000-T001-project-init.md`).
+**Layout & naming**: `specs/tasks/FNNN/NNN-<task-name>.md` — where `FNNN` is the feature number from the FRD (e.g., `F001` for `001-user-authentication.md`) and `NNN` is a per-feature sequential task number with a kebab-case description (e.g., `specs/tasks/F001/001-backend-scaffolding.md`, `specs/tasks/F001/002-login-endpoint.md`). Scaffolding tasks shared across features live under `specs/tasks/F000/` (e.g., `specs/tasks/F000/001-project-init.md`). Reference tasks elsewhere by the path-style ID `FNNN/NNN` (e.g., `F001/002`).
 
 Include in each task file:
 - **Task title and description**: Clear explanation of what needs to be built
@@ -83,4 +83,4 @@ Include in each task file:
 - [ ] Task dependencies clearly mapped
 - [ ] Each task has acceptance criteria and testing requirements
 - [ ] Tasks are implementation-agnostic (no code included)
-- [ ] Task files created in `specs/tasks/` with proper naming
+- [ ] Task files created under `specs/tasks/FNNN/` with proper naming

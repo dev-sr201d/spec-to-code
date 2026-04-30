@@ -25,7 +25,7 @@ Define the test strategy and implement integration, end-to-end, and contract tes
 **ALWAYS start by reading these files:**
 - `AGENTS.md` — Testing standards, coverage thresholds, and conventions
 - `specs/adr/*.md` — Architecture decisions (test framework choices, infrastructure)
-- `specs/tasks/*.md` — The task(s) being tested (acceptance criteria drive test cases)
+- `specs/tasks/**/*.md` — The task(s) being tested (acceptance criteria drive test cases)
 - `specs/features/*.md` — The feature requirements (functional requirements map to integration scenarios)
 
 ### 2. Determine Test Strategy
