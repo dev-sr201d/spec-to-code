@@ -40,6 +40,7 @@ Before starting any work, read:
 - **Write integration and E2E tests** for cross-component behavior using `/test-skill`
 - **Scaffold projects** according to technology choices in ADRs
 - **Maintain dependencies** — scan, classify, and apply updates using `/maintain-skill`
+- **Cut releases** — bump versions, update changelog, write release notes, prepare tags using `/release-skill`
 - **Debug issues** and fix defects efficiently
 - **Run tests locally** before considering work complete
 

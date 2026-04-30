@@ -90,6 +90,7 @@ For each threat, create an entry with this shape:
 | Residual risk | Severity after existing controls |
 | Required mitigations | New controls needed; describes WHAT, not HOW (e.g., "rate-limit endpoint X", "scope token to resource Y") |
 | Owning artifact | The FRD or ADR that must carry the mitigation as a requirement or decision |
+| Implementing tasks | Task IDs (`FNNN/NNN`) that deliver the mitigation. Populated and refreshed from the dev agent's plan handoff. Empty until tasks are planned; `—` is not acceptable once any task exists for the owning artifact. |
 | Status | `proposed`, `accepted`, `mitigated`, `accepted-risk` |
 
 ### 6. Cross-Reference to FRDs and ADRs
@@ -121,6 +122,7 @@ Before finalizing, check:
 - **Never delete threats.** Update `Status` as controls land. `mitigated` threats stay in the document with references to the implementing FRD/ADR/task.
 - **Re-run on change triggers.** New ADR introducing a new data store or identity provider, new FRD with an external interface, or new compliance regime in PRD §8 — re-enter this skill with that scope.
 - **Number stability.** `THR-NNN` IDs are stable. Superseded threats are marked, not renumbered.
+- **Refresh `Implementing tasks` on dev handoff.** When the dev agent submits a `THR-NNN → FNNN/NNN` coverage table after `/plan-skill`, update each cited threat's `Implementing tasks` field. Threats whose owning artifact has tasks but no `Implementing tasks` listed are coverage gaps — escalate to the dev agent. A threat may transition to `Status: mitigated` only after every cited task has passed `/code-review-skill`.
 
 ## Document Structure
 
@@ -150,6 +152,7 @@ Before finalizing, check:
 - [ ] STRIDE applied to every boundary, with skipped categories justified
 - [ ] Every threat has all required fields including residual risk and owning artifact
 - [ ] Every required mitigation maps to an FRD requirement, ADR decision, or AGENTS.md standard
+- [ ] `Implementing tasks` populated for every threat whose owning artifact has been planned
 - [ ] No critical threat is `accepted-risk` without explicit named approval
 - [ ] Existing threat IDs preserved; updates respect history
 - [ ] Diagram renders (Mermaid or referenced image exists)

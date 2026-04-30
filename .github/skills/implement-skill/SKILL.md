@@ -22,14 +22,16 @@ Implement a technical task from `specs/tasks/`, writing code and tests that foll
 - `specs/adr/*.md` — Architecture decisions for technology choices
 - `specs/prd.md` — Product requirements for overall context
 - `specs/features/*.md` — Relevant feature requirements
+- `specs/threat-model.md` — Required for tasks that cite `Threats Mitigated`; read at minimum every `THR-NNN` listed in the task
 - `specs/tasks/**/*.md` — Task specifications for what to implement (organized as `specs/tasks/FNNN/NNN-<task-name>.md`)
 
 **Context management for large projects:** When the project has many ADRs, FRDs, or task files, read selectively to stay within context limits:
 - Read `AGENTS.md` and the **specific task file** first — these are always required in full.
 - Read only the **FRD referenced by the task** (the `FNNN` folder containing the task file maps directly to the FRD), not all FRDs.
 - Read only the **ADRs referenced by the task or its FRD** (check ADR numbers cited in requirements), not all ADRs.
+- Read only the **`THR-NNN` entries cited in the task's `Threats Mitigated` section**, not the full threat model.
 - Read `specs/prd.md` only for overall context — skim the requirements table rather than reading every section in detail.
-- If context is still constrained, prioritize: task file > AGENTS.md > relevant ADRs > relevant FRD > PRD.
+- If context is still constrained, prioritize: task file > AGENTS.md > cited threats > relevant ADRs > relevant FRD > PRD.
 
 ### 2. Check Task Status
 
@@ -64,6 +66,7 @@ Write the implementation following:
 
 - Write unit tests for all public methods and functions
 - Cover edge cases and error conditions
+- **Write a mitigation test for every `THR-NNN` listed in the task's `Threats Mitigated` section** — the test must actively enforce the control (e.g., assert 401/403 on unauthenticated/unauthorized access, assert rejection of malformed input, assert rate-limit enforcement). The lead agent will block the review without these tests.
 - Follow the coverage threshold defined in the `General > Testing` section of `AGENTS.md`. If `AGENTS.md` does not specify a coverage threshold, **stop and hand off to the arch agent** to define one via `/standards-skill` before proceeding.
 - Run tests via `execute/runInTerminal` (e.g., `dotnet test`, `npm test`) and iterate until all pass
 - For integration, contract, or E2E tests beyond unit tests, use `/test-skill`

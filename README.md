@@ -91,12 +91,15 @@ The PM follows this sequence:
 | 4 | **arch** | Makes technology and architecture decisions | `specs/adr/*.md` |
 | 5 | **arch** | Generates engineering standards from ADR choices | `AGENTS.md` |
 | 6 | **arch** | Defines scaffolding infrastructure requirements | `specs/features/000-project-scaffolding.md` |
-| 7 | **arch** | Creates the STRIDE threat model | `specs/threat-model.md` |
-| 8 | **lead** | Reviews scaffolding requirements | Findings and recommendations |
-| 9 | **dev** | Breaks features into ordered technical tasks | `specs/tasks/FNNN/*.md` |
-| 10 | **dev** | Implements each task with tests | Source code and tests |
-| 11 | **lead** | Reviews code against acceptance criteria and standards | Verdict: approved or changes requested |
-| 12 | **doc** | Generates project documentation | `docs/` |
+| 7 | **lead** | Reviews scaffolding requirements | Findings and recommendations |
+| 8 | **arch** | Creates the STRIDE threat model — informed by FRDs and ADRs — so planned tasks can cite the mitigations they deliver | `specs/threat-model.md` |
+| 9 | **dev** | Breaks features into ordered technical tasks, each citing the threats it mitigates | `specs/tasks/FNNN/*.md` |
+| 10 | **lead** | Reviews the task plan, including FRD coverage, threat coverage, and §8 release criteria | Verdict: approved or changes requested |
+| 11 | **dev** | Implements each task with unit, integration, and mitigation tests | Source code and tests |
+| 12 | **lead** | Reviews code against acceptance criteria, standards, and cited threat mitigations | Verdict: approved or changes requested |
+| 13 | **dev** | Cuts a versioned release — changelog, release notes, prepared tag | `CHANGELOG.md`, `docs/operations/release-notes/X.Y.Z.md`, tag |
+| 14 | **lead** | Reviews the prepared release | Verdict: approved or changes requested |
+| 15 | **doc** | Generates project documentation | `docs/` |
 
 Each delegation pauses for your confirmation before proceeding — no agent acts until you approve. This is controlled by the `send: false` setting on all agent handoffs, which presents the delegation as a proposal rather than auto-executing it. You can redirect, provide feedback, or skip steps at any point.
 
@@ -121,6 +124,7 @@ For fine-grained control over individual steps, use prompts directly instead of 
 | Plan tasks for a feature | `/plan 001-user-authentication` | dev |
 | Implement a specific task | `/implement F001/003-login-endpoint` | dev |
 | Review specs before architecture | `/review-spec` | lead |
+| Review task plan before implementation | `/review-plan F001` | lead |
 | Review code after implementation | `/review-code F001/003-login-endpoint` | lead |
 | Re-evaluate a past architecture decision | `/reconsider 002-database-choice` | arch |
 
@@ -210,6 +214,7 @@ The **lead** agent classifies each issue as `promote` (add to an existing FRD), 
 | **implement-skill** | dev | Implement a task — write code and tests |
 | **test-skill** | dev | Integration, E2E, and contract tests |
 | **maintain-skill** | dev | Scan, classify, and apply dependency updates |
+| **release-skill** | dev | Cut versioned releases — semver bump, changelog, release notes, tag |
 | **code-review-skill** | lead | Review code against acceptance criteria and standards |
 | **spec-review-skill** | lead | Review specs for feasibility and completeness |
 | **triage-skill** | lead | Triage the analyst's issues manifest |
@@ -227,7 +232,9 @@ The **lead** agent classifies each issue as `promote` (add to an existing FRD), 
 | `/plan` | dev | Plan implementation tasks for a feature |
 | `/implement` | dev | Implement a specific task |
 | `/maintain` | dev | Scan and update dependencies |
+| `/release` | dev | Cut a versioned release |
 | `/review-spec` | lead | Review specs for feasibility and completeness |
+| `/review-plan` | lead | Review task plan for FRD coverage, threat coverage, and §8 release criteria |
 | `/review-code` | lead | Review implemented code |
 | `/triage` | lead | Triage pending issues in `specs/issues.md` |
 | `/analyze` | analyst | Reverse-engineer an existing codebase |
@@ -253,7 +260,9 @@ The **lead** agent classifies each issue as `promote` (add to an existing FRD), 
 │   ├── prd.prompt.md
 │   ├── reconsider.prompt.md
 │   ├── refine.prompt.md
+│   ├── release.prompt.md
 │   ├── review-code.prompt.md
+│   ├── review-plan.prompt.md
 │   ├── review-spec.prompt.md
 │   ├── threat-model.prompt.md
 │   └── triage.prompt.md
@@ -266,7 +275,9 @@ The **lead** agent classifies each issue as `promote` (add to an existing FRD), 
     ├── implement-skill/
     ├── maintain-skill/
     ├── plan-skill/
+    ├── plan-review-skill/
     ├── prd-skill/
+    ├── release-skill/
     ├── scaffold-skill/
     ├── spec-review-skill/
     ├── standards-skill/

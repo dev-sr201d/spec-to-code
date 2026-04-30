@@ -23,11 +23,13 @@ Review task files under `specs/tasks/FNNN/` for quality, feasibility, completene
 - `specs/prd.md` — Product requirements for overall vision
 - `specs/features/*.md` — The FRDs that the tasks trace to
 - `specs/adr/*.md` — Architecture decisions for technology constraints
+- `specs/threat-model.md` — Threats and required mitigations whose coverage the tasks must deliver
 - `specs/tasks/**/*.md` — The task files under review (organized in per-feature `FNNN/` subfolders)
 
 **Context management for large projects:** When reviewing tasks for a specific feature, read selectively:
 - Read the **target feature's FRD** in full.
 - Read only the **ADRs referenced by that FRD**.
+- Read **every threat** whose `Owning artifact` is the target FRD or any ADR it references.
 - Skim other FRDs only for cross-feature dependency verification.
 - Read `AGENTS.md` in full — it defines testing and acceptance criteria standards.
 
@@ -38,6 +40,25 @@ For each functional requirement (FR-N) in the parent FRD:
 1. **Trace to tasks** — Identify which task(s) address this requirement. Every FR must be covered by at least one task.
 2. **Flag gaps** — Requirements with no corresponding task are blockers.
 3. **Flag over-reach** — Tasks that introduce scope beyond what the FRD requires. Tasks must implement the FRD, not extend it.
+
+### 2a. Verify Threat Coverage
+
+Walk every threat in `specs/threat-model.md` whose `Owning artifact` is the target FRD or an ADR referenced by that FRD:
+
+1. **Trace to tasks** — Each in-scope threat must appear in the `Threats Mitigated` section of at least one task. Threats whose mitigation is delegated to scaffolding must cite an `F000/NNN` task.
+2. **Verify acceptance and test coverage** — For every cited `THR-NNN`, the implementing task must include at least one acceptance criterion and one mitigation test that verify the control. A bare citation without a corresponding criterion or test is a `blocker`.
+3. **Flag inconsistencies** — Tasks that cite a `THR-NNN` not present in `specs/threat-model.md` are `blocker` findings. Tasks that declare `Threats Mitigated: None` for work that obviously crosses a trust boundary (new endpoint, new data store, new external integration) are `blocker` findings.
+4. **Flag stale back-references** — If a threat's `Implementing tasks` list disagrees with the actual task citations, hand off to **arch** to refresh the threat model.
+
+### 2b. Verify FRD §8 Release Criteria
+
+The parent FRD's §8 Release Criteria block must be filled before tasks ship:
+
+- **Feature flag** — Either a flag name or `N/A` with a one-line rationale. Blank is a `blocker`.
+- **Rollout strategy** — Either a strategy or `N/A` with rationale. Blank is a `blocker`.
+- **Rollback plan** — Required for every user-facing feature; `N/A` is only acceptable for internal-only or pure-refactor features and must include a rationale. Blank is a `blocker`.
+
+If the FRD §8 fields are missing or blank, the verdict is `changes-requested` and the next action is to hand off to **po** to populate them — not to the dev agent. Plan-review does not edit FRDs.
 
 ### 3. Verify Task Quality
 
@@ -75,6 +96,8 @@ Provide a structured review:
 - **Feature**: Which feature's tasks were reviewed (FRD file path)
 - **Verdict**: `approved` or `changes-requested`
 - **FRD coverage**: Table mapping each FR-N to its task(s), noting gaps or over-reach
+- **Threat coverage**: Table mapping each in-scope `THR-NNN` to its task(s) and mitigation tests, noting unassigned threats and stale back-references
+- **FRD §8 release criteria**: Status of feature flag, rollout strategy, and rollback plan (filled / `N/A` with rationale / blank)
 - **Task findings**: For each task with issues:
   - Task file path
   - Issue description (what's wrong or missing)
@@ -86,6 +109,15 @@ Provide a structured review:
 ### 7. Re-Review Loop
 
 If the verdict is `changes-requested`, hand off to the **dev** agent with the specific findings. When the dev agent reports fixes are complete, re-run this entire procedure from Step 2 on the updated tasks. Each re-review is a full review — do not skip steps based on previous findings.
+
+**Iteration limit.** A task plan may go through at most **three** review cycles (initial review + two re-reviews). If a fourth cycle would be required, **stop the loop** and escalate to the user with:
+
+- The feature ID and FRD path
+- A delta summary across cycles: which findings were fixed, which recurred, which are new
+- The persistent root cause if identifiable (e.g., FRD is ambiguous, scaffolding is missing, ADR coverage is incomplete)
+- A recommended next action: refine the FRD via **po**, extend the scaffolding FRD via **arch**, or split the feature into smaller FRDs
+
+Do not silently approve to break the loop. Escalation is a normal outcome.
 
 ## Rules
 
@@ -99,6 +131,9 @@ If the verdict is `changes-requested`, hand off to the **dev** agent with the sp
 ## Quality Checklist
 
 - [ ] Every FRD requirement traced to at least one task
+- [ ] Every in-scope threat (`THR-NNN`) cited by at least one task with matching acceptance criteria and mitigation tests
+- [ ] No task cites a non-existent `THR-NNN`; no boundary-crossing task silently declares `Threats Mitigated: None`
+- [ ] Parent FRD §8 release criteria filled (flag, rollout, rollback) or `N/A` with rationale
 - [ ] No tasks exceed the FRD scope
 - [ ] Every acceptance criterion is objectively testable
 - [ ] Dependency graph has no cycles and follows logical order
@@ -106,4 +141,5 @@ If the verdict is `changes-requested`, hand off to the **dev** agent with the sp
 - [ ] No implementation code in task files
 - [ ] Security, error handling, and accessibility criteria present where required
 - [ ] No task files were modified by this review
+- [ ] Iteration limit respected — escalated to user if a fourth review cycle would be required
 - [ ] Findings report includes verdict, evidence, and clear next action

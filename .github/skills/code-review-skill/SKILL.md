@@ -56,6 +56,7 @@ Skip sections of `AGENTS.md` that don't apply to the task (e.g., frontend standa
 
 - **Confirm tests pass** — The dev agent must have run all tests before handing off for review. Check the task's test output or ask the dev agent for evidence. If test results are not available, hand back to the dev agent to run tests first.
 - **Check coverage** — If a coverage report is available, verify coverage meets the threshold defined in the `General > Testing` section of `AGENTS.md`. If `AGENTS.md` does not specify a coverage threshold, **stop and hand off to the arch agent** to define one via `/standards-skill` before continuing the review.
+- **Verify mitigation tests** — For every `THR-NNN` listed in the task's `Threats Mitigated` section, locate the corresponding mitigation test and confirm it actively exercises the control (e.g., asserts a 401/403 on unauthenticated/unauthorized access, asserts rejection of malformed input, asserts rate-limit enforcement). A cited threat with no enforcing test is a `blocker`. If the task declares `Threats Mitigated: None`, confirm by reading the diff that no new trust boundary, endpoint, data store, or external integration was introduced — if one was, the task is mis-declared and the verdict is `changes-requested`.
 - **Assess test quality** — Tests should verify behavior, not implementation details. Flag tests that:
   - Only test the happy path without error/edge cases
   - Mock the system under test rather than its dependencies
@@ -118,6 +119,7 @@ Provide a structured review:
 - **Task**: Which task was reviewed (file path)
 - **Verdict**: `approved` or `changes-requested`
 - **Acceptance criteria**: Checklist with pass/fail per criterion and evidence
+- **Threat mitigations**: For each `THR-NNN` cited in the task, the test that enforces the control with file path and assertion summary
 - **Standards compliance**: Any deviations from `AGENTS.md` with file path and line reference
 - **Test assessment**: Coverage level, quality issues, missing test cases
 - **Issues found**: Each issue with severity (blocker / warning / nit), file path, description, and suggested fix
@@ -125,7 +127,16 @@ Provide a structured review:
 
 ### 8. Re-Review Loop
 
-If the verdict is `changes-requested`, hand off to the **dev** agent with the specific findings. When the dev agent reports fixes are complete, re-run this entire procedure from Step 2 on the updated code. The loop continues until the verdict is `approved`. Each re-review is a full review — do not skip steps based on previous findings, as fixes may introduce new issues.
+If the verdict is `changes-requested`, hand off to the **dev** agent with the specific findings. When the dev agent reports fixes are complete, re-run this entire procedure from Step 2 on the updated code. Each re-review is a full review — do not skip steps based on previous findings, as fixes may introduce new issues.
+
+**Iteration limit.** A task may go through at most **three** review cycles (initial review + two re-reviews). If a fourth cycle would be required, **stop the loop** and escalate to the user with:
+
+- The task ID and parent FRD
+- A delta summary across cycles: which findings were fixed, which recurred, which are new
+- The persistent root cause if identifiable (e.g., "acceptance criterion is ambiguous", "dev and lead disagree on whether requirement is met", "underlying ADR does not cover this case")
+- A recommended next action: refine the FRD via **po**, amend an ADR via **arch**, split the task via **dev**, or accept the current state with a captured deviation
+
+Do not silently approve to break the loop, and do not allow indefinite ping-pong. Escalation is a normal outcome, not a failure.
 
 ## Rules
 
@@ -140,9 +151,12 @@ If the verdict is `changes-requested`, hand off to the **dev** agent with the sp
 ## Quality Checklist
 
 - [ ] Every acceptance criterion has been verified with evidence
+- [ ] Every cited `THR-NNN` has an enforcing mitigation test located in the diff
+- [ ] Tasks declaring `Threats Mitigated: None` have been confirmed against the diff (no new trust boundaries introduced)
 - [ ] Implementation checked against `AGENTS.md` standards
 - [ ] All tests confirmed passing (dev-provided evidence)
 - [ ] Test coverage meets threshold
 - [ ] Production-grade concerns reviewed (security, observability, reliability, data, risk controls)
 - [ ] No source code was modified by this review
+- [ ] Iteration limit respected — escalated to user if a fourth review cycle would be required
 - [ ] Findings report includes verdict, evidence, and clear next action

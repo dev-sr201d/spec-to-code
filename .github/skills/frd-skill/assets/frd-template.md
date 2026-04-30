@@ -34,6 +34,6 @@ As a [user type], I want to [do something], so that [benefit].
 
 ## 8. Release Criteria
 
-- **Feature flag**: [Flag name, if progressive delivery is used]
-- **Rollout strategy**: [All users / percentage rollout / opt-in]
-- **Rollback plan**: [How to disable the feature if issues arise]
+- **Feature flag**: [Flag name, if progressive delivery is used — or `N/A` with rationale]
+- **Rollout strategy**: [All users / percentage rollout / opt-in — or `N/A` with rationale]
+- **Rollback plan**: [How to disable the feature if issues arise — required, never `N/A` for user-facing features]
