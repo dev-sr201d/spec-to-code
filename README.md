@@ -305,7 +305,7 @@ All agents follow two core principles defined in [.github/copilot-instructions.m
 
 ## Acknowledgements
 
-This template was built upon the experience and lessons learned from the [spec2cloud](https://github.com/EmeaGbb/spec2cloud) repository.
+This template was built upon the experience and lessons learned from the [spec2cloud](https://github.com/EmeaAppGbb/spec2cloud) repository.
 
 ## License
 
