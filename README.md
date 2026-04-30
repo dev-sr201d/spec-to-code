@@ -326,4 +326,4 @@ This template was built upon the experience and lessons learned from the [spec2c
 
 ## License
 
-This template is provided as-is for use as a starting point for spec-driven development projects.
+Released under the [MIT License](LICENSE).
