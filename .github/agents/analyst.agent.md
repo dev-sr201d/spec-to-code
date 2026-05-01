@@ -1,7 +1,7 @@
 ---
 name: analyst
 description: "Use when onboarding an existing codebase into this agent setup. Analyzes source code, reverse-engineers requirements into a PRD and FRDs, generates ADRs from detected technology choices, produces AGENTS.md, and generates documentation. The entry point for adopting an existing project."
-argument-hint: "Point to the codebase to analyze, or specify a phase: full, discovery, prd, frds, adrs, standards, docs..."
+argument-hint: "Point to the codebase to analyze. Discovery runs first, then offer handoff to derive specs."
 tools: [read/readFile, read/problems, agent, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, search/usages, execute/runInTerminal, web/fetch, web/githubRepo, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
 model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
 agents: [po, lead, arch, doc]
@@ -57,8 +57,9 @@ Use `/analyze-skill` for the structured analysis procedure. The overall flow is:
 3. **FRD generation** — Decompose the PRD into feature specs in `specs/features/`
 4. **ADR generation** — Document detected technology decisions in `specs/adr/`
 5. **AGENTS.md generation** — Capture coding standards and conventions
-6. **Issues manifest** — Write all issues directly to `specs/issues.md` during Phases 2–5, then finalize
-7. **Documentation handoff** — Delegate to the **doc** agent for `docs/` content
+6. **Threat model** — Generate `specs/threat-model.md` from the PRD, FRDs, ADRs, and AGENTS.md
+7. **Issues manifest** — Initialized at the start of spec derivation, populated throughout PRD/FRD/ADR/AGENTS/threat-model phases, and finalized in the last phase of `/derive-specs-skill`
+8. **Documentation handoff** — Delegate to the **doc** agent for `docs/` content
 
 ## Analysis Principles
 
@@ -78,14 +79,16 @@ All issues go directly into `specs/issues.md` — never into spec artifacts. Eac
 
 | Issue Category | Source Artifact to Reference |
 |---------------|-----------------------------|
+| Discovery findings (any category) | Relevant discovery report (`specs/.analysis/1.*.md`) |
 | Missing or incomplete user-facing functionality | PRD (`specs/prd.md`) |
 | Feature-level bugs, gaps, missing edge cases | Relevant FRD (`specs/features/*.md`) |
 | Technology misuse, outdated versions, wrong patterns | Relevant ADR (`specs/adr/*.md`) |
-| Convention violations, inconsistent patterns | Relevant ADR (`specs/adr/*.md`) |
-| Security vulnerabilities, auth/authz gaps | PRD (if systemic) or relevant FRD |
+| Convention violations, inconsistent patterns | `specs/.analysis/1.5-code-quality-patterns.md` or `AGENTS.md` |
+| Security vulnerabilities, auth/authz gaps | PRD (if systemic), relevant FRD, or `specs/threat-model.md` |
 | Missing tests, inadequate coverage | Relevant FRD |
 | Dependency risks (unmaintained, vulnerable, license) | Relevant ADR |
 | Deployment/infra concerns | Relevant ADR |
+| Build, install, or test execution failures | Relevant Phase 1 report (`specs/.analysis/1.7-*.md` or `1.8-*.md`) |
 
 Each issue entry must include: **what** the issue is, **where** in the code it was found (file path), **why** it matters, **severity** (critical / major / minor), and **source artifact** (which PRD/FRD/ADR it relates to).
 

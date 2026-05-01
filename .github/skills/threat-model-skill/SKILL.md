@@ -13,7 +13,7 @@ Produce or refresh `specs/threat-model.md` — the project's authoritative threa
 - After ADRs and the scaffolding FRD are accepted on a new project
 - When a new external interface is introduced (new API, new third-party integration, new data store, new auth mechanism)
 - When an FRD or ADR changes trust boundaries, identity, data flows, or stored data classes
-- During the existing-codebase onboarding flow, after Phase 5 (AGENTS.md) of `/analyze-skill`
+- During the existing-codebase onboarding flow, after the AGENTS.md phase of `/derive-specs-skill`
 - On a recurring cadence defined by the project's compliance scope (PRD §8)
 
 ## Inputs

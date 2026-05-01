@@ -2,7 +2,7 @@
 name: explore-write
 description: "Use when exploring a codebase with context isolation and writing the requested artifact, such as analysis reports, specs, or documentation summaries. Best for analyst and documenter subagent work that must read broadly but write only the explicitly requested output files."
 argument-hint: "Describe what to inspect, which files may be written, and what summary to return..."
-tools: [read, search, edit/createFile, edit/editFiles]
+tools: [read, search, edit/createFile, edit/editFiles, execute/runInTerminal]
 user-invocable: false
 agents: []
 model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
@@ -23,6 +23,7 @@ Use this agent when the caller needs:
 
 - Explore broadly, but write narrowly
 - Only create or update the files explicitly requested by the caller
+- Run terminal commands only when the caller explicitly requests verification or evidence collection for the requested artifact
 - Never modify application source code unless the caller explicitly authorizes that exact file path
 - Never broaden scope from "write a report" into "fix the code"
 - Never rewrite unrelated existing artifacts for cleanup or style only
