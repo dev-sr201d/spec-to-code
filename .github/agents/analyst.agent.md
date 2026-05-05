@@ -4,8 +4,12 @@ description: "Use when onboarding an existing codebase into this agent setup. An
 argument-hint: "Point to the codebase to analyze. Discovery runs first, then offer handoff to derive specs."
 tools: [read/readFile, read/problems, agent, edit/createDirectory, edit/createFile, edit/editFiles, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/changes, search/usages, execute/runInTerminal, web/fetch, web/githubRepo, context7/query-docs, context7/resolve-library-id, deepwiki/ask_question, deepwiki/read_wiki_contents, deepwiki/read_wiki_structure, mdn/get-compat, mdn/get-doc, mdn/search, microsoft.docs.mcp/microsoft_code_sample_search, microsoft.docs.mcp/microsoft_docs_fetch, microsoft.docs.mcp/microsoft_docs_search, todo]
 model: ['Claude Opus 4.6 (copilot)', 'GPT-5.4 (copilot)', 'Claude Sonnet 4.6 (copilot)']
-agents: [po, lead, arch, doc]
+agents: [analyst, po, lead, arch, doc]
 handoffs:
+  - label: Derive Specs from Analysis
+    agent: analyst
+    prompt: Discovery is complete and specs/.analysis/ contains all reports. Run /derive-specs-skill to derive the full project specs (PRD, FRDs, ADRs, AGENTS.md, threat model, and issues manifest).
+    send: false
   - label: Refine PRD with Product Owner
     agent: po
     prompt: I've reverse-engineered a PRD from the codebase. Please review and refine it with the user.
