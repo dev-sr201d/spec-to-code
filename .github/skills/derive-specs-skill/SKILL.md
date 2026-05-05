@@ -51,7 +51,7 @@ Phases must execute in this order due to data dependencies:
 
 - **Phase 1** (Issues Manifest Initialization) must run before any other phase. It creates `specs/issues.md` and transfers all qualifying Phase 1 discovery issues into it.
 - **Phase 2** (PRD) must complete before Phase 3 (FRDs), since FRDs reference `REQ-N` items from the PRD.
-- **Phase 4** (ADRs) may run in parallel with Phases 2–3 — it depends only on discovery findings and the initialized manifest. Because Phases 2, 3, and 4 may all generate issues concurrently, each phase writes its issues to a per-artifact staging file (see Phase 1 and Phase 7); none of them edit `specs/issues.md` directly. Phase 7 merges all staging files into the manifest and assigns final `ISS-NNN` IDs in a single, deterministic pass.
+- **Phase 4** (ADRs) may run in parallel with Phases 2–3 — it depends only on discovery findings and the initialized manifest. Because Phases 2, 3, and 4 may all generate issues concurrently, each phase writes its issues to a per-artifact staging file (see Phase 1 and Phase 7); none of them edit `specs/issues.md` directly. Phase 7 collects all issues, deduplicates, sorts by severity, and assigns final `ISS-NNN` IDs.
 - **Phase 5** (AGENTS.md) should follow Phase 4, so conventions can cross-reference ADR decisions.
 - **Phase 6** (Threat Model) should follow Phases 2–5 — it consumes PRD compliance/privacy scope, FRD interfaces, and ADR technology choices.
 - **Phase 7** (Issues Manifest Finalization) must run last — issues accumulate throughout Phases 2–6.
@@ -72,7 +72,7 @@ A separate `specs/.analysis/issues-staging-doc.md` may be created later by the *
 
 Phases 5 and 6 also use staging files even though they run sequentially after Phases 2–4. This keeps the Phase 7 merge/dedup pass uniform across all derivation phases — every issue except the discovery transfer in this phase flows through staging.
 
-Staging files use the same row schema as the manifest **except** the `ID` column is left blank — Phase 7 assigns final `ISS-NNN` IDs in a single deterministic pass (see Phase 7). Discovery (Phase 1) issues are exempt from staging because this phase merges them; they are recorded directly into `specs/issues.md` here.
+Staging files use the same row schema as the manifest **except** the `ID` column is left blank — Phase 7 assigns final `ISS-NNN` IDs after deduplication and sorting (see Phase 7). Discovery (Phase 1) issues are written directly into `specs/issues.md` here, also without IDs — Phase 7 assigns IDs to all issues uniformly.
 
 1. **Create the manifest** — Create `specs/issues.md` from the [issues manifest template](./assets/issues-template.md). The preconditions check guarantees no prior manifest exists.
 2. **Create empty staging files** — Create each `specs/.analysis/issues-staging-*.md` listed above with the schema header row but no issue rows. Downstream phases append to these files instead of `specs/issues.md`.
@@ -85,7 +85,7 @@ Staging files use the same row schema as the manifest **except** the `ID` column
      - Outdated or EOL dependencies and version-currency findings from 1.2
      - Anti-patterns from 1.3
    - **Skip** if it is a factual observation, not a defect (e.g., "project uses Express 4.x" is a finding, not an issue).
-4. **Assign metadata** to each promoted issue using the schema defined in the [issues manifest template](./assets/issues-template.md) — the template is the **canonical schema**. Discovery issues are written directly to `specs/issues.md` and receive their `ISS-NNN` IDs now, in insertion order. Source artifact for discovery issues is the relevant `specs/.analysis/1.*.md` report path. Code location must come from the original finding's evidence. Initialize `Triage` to `pending` and leave `Resolution` blank — the lead agent populates both during triage.
+4. **Assign metadata** to each promoted issue using the schema defined in the [issues manifest template](./assets/issues-template.md) — the template is the **canonical schema**. Discovery issues are written directly to `specs/issues.md` with the `ID` column left blank — Phase 7 assigns all IDs after deduplication and sorting. Source artifact for discovery issues is the relevant `specs/.analysis/1.*.md` report path. Code location must come from the original finding's evidence. Initialize `Triage` to `pending` and leave `Resolution` blank — the lead agent populates both during triage.
 5. **Categories** — Use the canonical category list defined in the [issues manifest template](./assets/issues-template.md). In practice, `convention` issues typically enter in Phase 5 and `functionality` issues in Phases 2–3, but Phase 1 may use any category if the underlying discovery finding warrants it.
 6. **Severity guidance**:
    - Build or dependency install failures → `critical`
@@ -168,18 +168,19 @@ After AGENTS.md is in place, generate the initial threat model so that downstrea
 
 ### Phase 7: Issues Manifest Finalization
 
-Throughout Phases 1–6, discovery issues were written directly to `specs/issues.md` and Phases 2–6 appended their issues to per-artifact staging files (`specs/.analysis/issues-staging-*.md`). This phase merges the staging files into the manifest, assigns final IDs, validates, deduplicates, and finalizes.
+During Phases 1–6, discovery issues were written to `specs/issues.md` (without IDs) and Phases 2–6 appended their issues to per-artifact staging files (`specs/.analysis/issues-staging-*.md`). This phase collects all issues, deduplicates, sorts by severity, assigns final IDs, and validates.
 
-1. **Merge staging files into the manifest** — In a single deterministic pass, append every staged issue to `specs/issues.md` in this order: PRD → FRD → ADR → AGENTS → threat-model. Within a single staging file, preserve the order of insertion. Assign `ISS-NNN` IDs sequentially, continuing from the highest ID already present from Phase 1. Once assigned, IDs are stable references and never change. (A `specs/.analysis/issues-staging-doc.md` may be created later by the **doc** agent when it generates `docs/`; it is merged by the doc agent's own procedure, not here.)
-2. **Issue format** — Every merged entry must conform to the schema defined in the [issues manifest template](./assets/issues-template.md): unique ID (`ISS-NNN`), severity, category, source artifact, code location, description, rationale, `Triage` initialized to `pending`, and `Resolution` initialized blank. The template is the canonical schema — refer to it rather than restating fields here.
-3. **Validate completeness** — Review the manifest for: missing fields, inconsistent severity ratings, and issues that lack code location evidence.
-4. **Deduplicate overlapping issues across phases** — A single root cause may have been recorded by more than one phase. Common overlaps: 1.4 security findings and Phase 6 threat-model issues (e.g., "missing authz on `/admin`"); 1.5 convention findings transferred in Phase 1 and convention deviations re-recorded in Phase 5; 1.2 dependency findings and Phase 4 ADR version-currency issues. For each overlap, perform a **tombstone merge**:
-   - Choose the **canonical** entry: the one with the lowest `ISS-NNN`. Update its row to list **all** source artifacts (comma-separated) and use the **highest** severity among the merged entries. Append a note to its rationale describing the merge (e.g., "Merged with ISS-027 (Phase 6 threat model) and ISS-041 (Phase 4 ADR currency)").
-   - Convert each non-canonical entry into a **tombstone row**: keep the original `ISS-NNN` and original source artifact, set `Triage` to `duplicate`, set `Resolution` to `"Merged into ISS-NNN"` referencing the canonical ID, and replace the description with `"[merged into ISS-NNN — see canonical entry]"`. The tombstone preserves the stable ID for any external citations.
-   - Never delete a row and never reuse an `ISS-NNN`.
-5. **Sort the display by severity, then ID** — Reorder rows so critical appears first, then major, then minor, and place `duplicate`-triaged tombstones last regardless of severity (they carry no actionable severity). Within each group, sort by `ISS-NNN` ascending. **Do not renumber `ISS-NNN` IDs** — IDs are stable references that may already be cited from other artifacts; only the row order changes.
+1. **Collect all issues** — Gather every issue from `specs/issues.md` (Phase 1 discovery issues) and from each staging file in this order: PRD → FRD → ADR → AGENTS → threat-model. (A `specs/.analysis/issues-staging-doc.md` may be created later by the **doc** agent when it generates `docs/`; it is merged by the doc agent's own procedure, not here.)
+2. **Deduplicate** — A single root cause may have been recorded by more than one phase. Common overlaps: 1.4 security findings and Phase 6 threat-model issues (e.g., "missing authz on `/admin`"); 1.5 convention findings transferred in Phase 1 and convention deviations re-recorded in Phase 5; 1.2 dependency findings and Phase 4 ADR version-currency issues. For each set of duplicates:
+   - Keep one canonical entry: use the **highest** severity among the duplicates and list **all** source artifacts (comma-separated). Append a note to its rationale listing the merged sources.
+   - **Remove** all other duplicate entries entirely. Staging files are ephemeral and deleted after finalization — there are no external references to preserve.
+3. **Sort by severity** — Order the deduplicated list so `critical` issues appear first, then `major`, then `minor`. Within each severity group, preserve insertion order (discovery issues first, then PRD, FRD, ADR, AGENTS, threat-model).
+4. **Assign IDs** — Number the sorted list sequentially as `ISS-001`, `ISS-002`, … starting from 1. IDs reflect final sort position.
+5. **Write the finalized manifest** — Rebuild `specs/issues.md` with the sorted, numbered, deduplicated issues.
+6. **Issue format** — Every entry must conform to the schema defined in the [issues manifest template](./assets/issues-template.md): unique ID (`ISS-NNN`), severity, category, source artifact, code location, description, rationale, `Triage` initialized to `pending`, and `Resolution` initialized blank. The template is the canonical schema — refer to it rather than restating fields here.
+7. **Validate completeness** — Review the manifest for: missing fields, inconsistent severity ratings, and issues that lack code location evidence.
 
-Valid triage values (set by the **lead** agent later, not by the analyst): `pending`, `promote` (will become a requirement in an FRD), `new-frd` (warrants a standalone remediation FRD), `needs-investigation` (evidence insufficient to decide; requires more information), `accepted-debt` (acknowledged, not actioned now), `duplicate`.
+Valid triage values (set by the **lead** agent later, not by the analyst): `pending`, `promote` (will become a requirement in an FRD), `new-frd` (warrants a standalone remediation FRD), `needs-investigation` (evidence insufficient to decide; requires more information), `accepted-debt` (acknowledged, not actioned now).
 
 This manifest is the **single source of truth** for analyst-discovered issues. Downstream agents (lead, po, dev) consume it — spec artifacts (PRD, FRDs, ADRs) contain only clean spec content, no issues.
 
@@ -221,4 +222,4 @@ Triage of `specs/issues.md` by the **lead** agent is independent of the document
 - [ ] Threat model produced at `specs/threat-model.md` and cross-referenced to FRDs/ADRs
 - [ ] Threats with no existing control were promoted to issues using the threat-to-issue severity mapping
 - [ ] Every issue in the manifest has a unique ID, severity, category, source artifact, code location, and rationale
-- [ ] Manifest is consolidated, deduplicated via tombstone merges, and sorted by severity then ID without renumbering
+- [ ] Manifest is deduplicated (duplicates removed), sorted by severity, and IDs assigned sequentially after sorting
