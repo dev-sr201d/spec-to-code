@@ -6,7 +6,7 @@
 
 | Field | Description |
 |-------|-------------|
-| `ID` | Unique identifier `ISS-NNN`, assigned in insertion order. Stable reference — never renumber. |
+| `ID` | Unique identifier `ISS-NNN`, assigned sequentially after final severity sort. Stable after assignment — never renumber. |
 | `Severity` | `critical` \| `major` \| `minor` |
 | `Category` | `security` \| `quality` \| `convention` \| `testing` \| `dependency` \| `documentation` \| `build` \| `functionality` |
 | `Source` | One or more source artifact paths, comma-separated (`specs/.analysis/1.*.md`, `specs/prd.md`, `specs/features/*.md`, `specs/adr/*.md`, `specs/threat-model.md`). |
@@ -18,7 +18,7 @@
 
 ## Issues
 
-Sort order: `Severity` (critical → major → minor), then `ID` ascending. IDs are assigned in insertion order and never change when rows are reordered.
+Sort order: `Severity` (critical → major → minor), then insertion order within each severity group. IDs are assigned sequentially after sorting and are stable — never renumber after assignment.
 
 | ID | Severity | Category | Source | Location | Description | Rationale | Triage | Resolution |
 |----|----------|----------|--------|----------|-------------|-----------|--------|------------|

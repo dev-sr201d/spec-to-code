@@ -43,7 +43,7 @@ Only proceed past this check when none of the listed paths exist.
 
 ## Build Verification Consent
 
-Before launching the discovery sub-phases, ask the user whether to authorize build verification. This determines the execution mode for sub-phases 1.4, 1.7, and 1.8, and the scheduling of sub-phase 1.8 (see "Side-effect ordering for 1.7 and 1.8" below).
+Before launching the discovery sub-phases, ask the user whether to authorize build verification. This determines the execution mode for sub-phases 1.4, 1.7, and 1.8, and the scheduling of sub-phase 1.8 (see "Scheduling rules" under the Procedure section).
 
 Ask with these choices:
 
@@ -58,12 +58,35 @@ Systematically analyze the project to build a complete mental model. **Do not sk
 
 **Delegation**: Each discovery sub-phase (1.1–1.8) must be delegated to its own subagent for context isolation. Each subagent receives the task description below and must return a structured findings report. After all subagents complete, synthesize their findings into a unified understanding.
 
-**Subagent execution**: Invoke the **explore-write** agent (defined in `.github/agents/explore-write.agent.md`) via `agent/runSubagent` for all discovery sub-phases. It has read, search, edit, and terminal execution tools — enough to explore broadly, run the required test/install/build verification commands, and write the analysis report files. Before launching any sub-phase, ensure `specs/.analysis/` exists (create it if not) so subagents can write their reports there. Sub-phases 1.1 and 1.2 must run first (sequentially or in parallel). Once their results are available, sub-phases 1.3–1.8 may run in parallel — they do not depend on each other's findings. Pass relevant findings from 1.1/1.2 into each subsequent subagent prompt for context.
+**Subagent execution**: Invoke the **explore-write** agent (defined in `.github/agents/explore-write.agent.md`) via `agent/runSubagent` for all discovery sub-phases. It has read, search, edit, and terminal execution tools — enough to explore broadly, run the required test/install/build verification commands, and write the analysis report files. Before launching any sub-phase, ensure `specs/.analysis/` exists (create it if not) so subagents can write their reports there. Pass relevant findings from 1.1/1.2 into each subsequent subagent prompt for context.
 
-**Side-effect ordering for 1.7 and 1.8**: 1.7 (Build & Dependency Verification) and 1.8 (Testing Analysis) are logically independent, but executing the test suite is far more useful once dependencies are installed and the project builds. 1.8 is numbered after 1.7 to reflect this: when build verification is authorized, the test runner can use the freshly prepared environment. Ordering depends on the consent mode established above:
+**Scheduling rules:**
 
-- **No consent (default)** — 1.7 and 1.8 run in parallel with sub-phases 1.3–1.6. 1.7 stays in static-only mode (no commands executed). 1.8 runs best-effort: it executes the test suite only if dependencies happen to already be present, otherwise it produces static analysis only.
-- **Consent given** — Hold 1.8 until 1.7 has returned its summary. Then launch 1.8 with the freshly installed/built environment so it can execute the test suite reliably. 1.7 still runs in parallel with sub-phases 1.3–1.6.
+1. **Sub-phases 1.1 and 1.2 run in parallel** — they have no dependencies on each other. Both must complete before launching subsequent sub-phases.
+2. **Sub-phases 1.3–1.7 run in parallel** — once 1.1 and 1.2 results are available, launch 1.3 through 1.7 concurrently. They do not depend on each other's findings.
+3. **Sub-phase 1.8 scheduling depends on the consent mode:**
+   - **Static-only (no consent given)** — 1.8 runs in parallel with 1.3–1.7. In this mode 1.7 performs only static analysis (no commands executed), so 1.8 gains nothing from waiting. 1.8 runs best-effort: it executes the test suite only if dependencies happen to already be present, otherwise it produces static analysis only.
+   - **Consent given** — Hold 1.8 until 1.7 has returned its summary. 1.7 installs dependencies and builds the project, and 1.8 needs that prepared environment to execute the test suite reliably. Launch 1.8 only after 1.7 completes.
+
+**Error handling — validate, retry, degrade:**
+
+After each subagent returns, validate the result before proceeding:
+
+1. **Validate** — Check that:
+   - The report file exists at `specs/.analysis/<phase>.md` with non-zero content.
+   - The report contains the three required sections (Summary, Findings, Issues).
+   - The subagent returned a non-empty condensed summary.
+2. **Retry once** — If validation fails, relaunch the subagent with:
+   - The original prompt.
+   - The specific validation failure (e.g., "report file was not written", "Issues section missing").
+   - Any partial report content already written, so the retry can build on it rather than restart from scratch.
+3. **Degrade** — If the retry also fails:
+   - Write a **failure stub** to `specs/.analysis/<phase>.md` containing: the sub-phase name, what was attempted, the validation failure, and a note that this phase is incomplete.
+   - Mark the sub-phase as `degraded` in the orchestrator's internal tracking.
+   - **Continue** with the remaining sub-phases — they are independent.
+   - Do not abort the workflow. Downstream synthesis and derivation will handle the gap.
+
+One retry is the limit. If the failure is transient (context pressure, tool flake), one retry usually recovers. If it is structural (codebase too large for a single subagent pass), further retries will not converge.
 
 For each subagent call, instruct it to:
 - Perform only its assigned sub-phase
@@ -85,6 +108,7 @@ The full reports in `specs/.analysis/` serve as the detailed reference. The cond
 **Delegate as subagent** — Return: project type, entry points, directory-to-layer mapping, dead/orphaned directories.
 
 - List the root directory and **every** subdirectory recursively (use search/listDirectory). **Skip directories matched by `.gitignore` and common build/dependency output folders** (`node_modules/`, `dist/`, `build/`, `.venv/`, `venv/`, `target/`, `bin/`, `obj/`, `.next/`, `.nuxt/`, `coverage/`, `.cache/`, etc.). Note their presence but do not enumerate their contents.
+- **Depth limit** — Enumerate fully to a maximum depth of **10 levels** from the project root. For directories deeper than this limit, record the path and a one-line note ("deep subtree, not fully enumerated") without listing their contents. If the total number of non-ignored directories exceeds **500**, switch to a sampling strategy: fully enumerate the top 4 levels, then selectively expand only directories that appear to contain entry points, configuration, or distinct architectural layers.
 - Identify the project type (web app, API, CLI, library, monorepo, etc.)
 - Locate **all** entry points (`main`, `index`, `app`, `server`, startup files, etc.)
 - Map the directory layout to logical layers (frontend, backend, shared, infra, etc.)
@@ -156,7 +180,7 @@ The full reports in `specs/.analysis/` serve as the detailed reference. The cond
 **Consent required for execution.** Installing dependencies and running builds mutates the workspace, may modify lockfiles, and triggers outbound network calls to package registries. Consent is collected once at the **Build Verification Consent** gate above before any sub-phase is launched, so 1.3–1.8 can be scheduled correctly. Two modes:
 
 - **Static-only (default if not asked or declined)** — The subagent inspects build/dependency configuration, identifies the install and build commands the project expects, documents prerequisites and environment assumptions, and reports any obvious misconfiguration visible without execution. **No `execute/runInTerminal` calls.** 1.8 runs in parallel in best-effort mode.
-- **Authorized** — The subagent additionally runs the install and build commands. 1.8 is held until this sub-phase returns so it can execute tests against the prepared environment (see "Side-effect ordering for 1.7 and 1.8" above).
+- **Authorized** — The subagent additionally runs the install and build commands. 1.8 is held until this sub-phase returns so it can execute tests against the prepared environment (see "Scheduling rules" above).
 
 In authorized mode:
 
@@ -181,7 +205,7 @@ Static baseline (always performed):
 - Check for test infrastructure: fixtures, factories, mocks, test utilities
 - Identify untested critical paths (auth flows, payment handling, data mutations)
 
-Optional test execution (depends on the consent mode established in 1.7 — see "Side-effect ordering for 1.7 and 1.8"):
+Optional test execution (depends on the consent mode — see "Scheduling rules" above):
 
 - **Authorized run (1.7 already completed install/build)** — Execute the test suite using `execute/runInTerminal` against the prepared environment. Record number of tests, pass/fail counts, failing test names, and overall execution time. If the runner is missing or misconfigured, document the exact reason. Runtime evidence (true coverage, pass/fail outcomes) is recorded here, not in the static baseline.
 - **Best-effort run (no consent given)** — Execute the test suite only if a runner is configured **and** dependencies are already present (e.g., a checked-in `node_modules/`, an active virtualenv, a restored `obj/` tree). **Do not install dependencies** — that is 1.7's responsibility and is gated on user consent. If dependencies are missing, skip execution and note the reason.
@@ -191,6 +215,7 @@ Optional test execution (depends on the consent mode established in 1.7 — see 
 After all subagent summaries are returned, consolidate them into a unified view:
 
 - Work primarily from the **condensed summaries** returned by each subagent
+- **Handle degraded sub-phases** — If any sub-phase is marked `degraded` (failed validation after retry), note it explicitly in the synthesis. Record each degraded sub-phase as a `quality` issue (severity `major`) in the Issues section: "Sub-phase X.Y did not complete — [domain] analysis is incomplete." Downstream `/derive-specs-skill` transfers this into the issues manifest so it is visible during triage.
 - When summaries conflict or lack detail, **read the full report** from `specs/.analysis/<phase>.md` to resolve
 - **Resolve contradictions** using the following procedure, in order:
   1. Prefer findings backed by cited file paths/line ranges over un-cited claims.
@@ -199,7 +224,7 @@ After all subagent summaries are returned, consolidate them into a unified view:
   4. Record any contradiction that cannot be resolved as a `quality` issue in the synthesis report so it is transferred to `specs/issues.md` during spec derivation.
 - Build the complete mental model: project type, tech stack, components, data flows, security posture, quality level, test coverage
 - Identify cross-cutting issues that span multiple sub-phases
-- Write the synthesized overview to `specs/.analysis/1.9-synthesis.md`. Use the same **Findings Report Format** (Summary / Findings / Issues) as sub-phases 1.1–1.8. The `Issues` section must record cross-cutting issues that do not belong to a single sub-phase, plus any unresolved contradictions from the resolution procedure above, using the same schema. `/derive-specs-skill` reads this section when transferring discovery issues into the issues manifest.
+- Write the synthesized overview to `specs/.analysis/1.9-synthesis.md`. Use the same **Findings Report Format** (Summary / Findings / Issues) as sub-phases 1.1–1.8. The `Issues` section must record cross-cutting issues that do not belong to a single sub-phase, degraded sub-phase notices, plus any unresolved contradictions from the resolution procedure above, using the same schema. `/derive-specs-skill` reads this section when transferring discovery issues into the issues manifest.
 
 ## Output Summary
 
@@ -207,7 +232,7 @@ After completing discovery, provide a summary report:
 
 - **Project type**: What kind of project this is
 - **Tech stack**: Languages, frameworks, and key libraries detected (with version currency status)
-- **Discovery coverage**: Confirm all eight sub-phases produced reports under `specs/.analysis/`
+- **Discovery coverage**: Confirm all eight sub-phases produced reports under `specs/.analysis/`. List any sub-phases that are `degraded` (incomplete after retry) and the domain gaps they represent.
 - **Top critical issues**: List the most urgent findings recorded in the sub-phase `Issues` sections (security gaps, build/test failures, vulnerable dependencies)
 - **Observations**: Notable patterns, technical debt, or concerns found
 - **Build verification mode**: Static-only or authorized, and a brief note on whether install/build/test commands were actually executed
@@ -225,6 +250,6 @@ If the user wants to stop after discovery, leave `specs/.analysis/` in place and
 - [ ] Security audit completed against OWASP Top 10
 - [ ] Testing analysis completed with coverage gaps identified
 - [ ] Build and dependency verification was performed in the mode authorized by the user (static-only or executed), and results documented
-- [ ] All nine reports (`1.1-*.md` through `1.9-synthesis.md`) exist under `specs/.analysis/`, and the synthesis contains cross-cutting issues plus any unresolved contradictions
+- [ ] All nine reports (`1.1-*.md` through `1.9-synthesis.md`) exist under `specs/.analysis/` — degraded sub-phases have a failure stub, and the synthesis records them as `quality` issues
 - [ ] Every finding cites specific file paths
 - [ ] Every issue is classified by severity (critical / major / minor) and tagged with its source sub-phase
